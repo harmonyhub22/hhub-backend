@@ -1,3 +1,5 @@
+docker-compose up -d
+
 $env:FLASK_APP = "app"
 $env:FLASK_ENV = "development"
 

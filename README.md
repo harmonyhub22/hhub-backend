@@ -38,7 +38,7 @@ Set-up Instructions
     pip install -r requirements.txt
     ```
 
-5. Run the executable scripts
+5. Start the server and database
 
     Mac
     ```
@@ -71,6 +71,10 @@ III. Enter the Local Postgres Datbase with the following command
 (Docker Container: hhub-db)
 
 ```
-psql -h localhost -p 5432 -U compose-postgres -W
+psql -h localhost -p 5432 -U $POSTGRES_USER -W
 ```
-Password: 12345
+Password: literally anything
+
+IV. Trouble connecting to the local database?
+
+Stop the Postgres Service on your local computer.
