@@ -23,7 +23,7 @@ Set-up Instructions
     docker pull postgres:13.6-alpine
     ```
 
-3. Get the Environment Variables file <code>.env.local</code> from a team member.
+3. Get the Environment Variables file <code>.env</code> from a team member.
 
 4. Enter the virtual environment
 
@@ -52,3 +52,25 @@ Set-up Instructions
 
 
 To leave the virtual environment, simply enter <code>deactivate</code>
+
+# Notes for Developers
+
+I. After adding a new pip library, be sure to run
+
+```
+pip freeze > requirements.txt
+```
+
+II. To deploy to Production Server, add a Heroku remote as follows
+
+```
+git remote add heroku git@github.com:harmonyhub22/hhub-backend.git
+```
+
+III. Enter the Local Postgres Datbase with the following command
+(Docker Container: hhub-db)
+
+```
+psql -h localhost -p 5432 -U compose-postgres -W
+```
+Password: 12345

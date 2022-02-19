@@ -1,7 +1,8 @@
-version: '2'
+version: '3.6'
 
 services:
   db:
+    restart: always
     image: 'postgres:13.1-alpine'
     container_name: hhub-db
     ports:

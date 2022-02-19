@@ -1,7 +1,8 @@
-#docker-compose down
-#docker rmi hhub-db:latest
-#docker-compose up
-
 $env:FLASK_APP = "app"
 $env:FLASK_ENV = "development"
+
+flask db init
+flask db migrate
+flask db upgrade
+
 flask run
