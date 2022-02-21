@@ -28,6 +28,7 @@ Set-up Instructions
 4. Enter the virtual environment
 
     ```
+    python3 -m venv venv
     . ./venv/Scripts/activate
     ```
 
