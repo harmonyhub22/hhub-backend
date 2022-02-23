@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_autocrud import AutoCrud
 import os
 
 app = Flask(__name__)
@@ -30,6 +30,8 @@ db.create_all()
 
 from seed.data import seed
 seed()
+
+AutoCrud(app, db)
 
 @app.route("/")
 def hello_world():
