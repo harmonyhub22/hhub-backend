@@ -28,7 +28,17 @@ Set-up Instructions
 4. Enter the virtual environment
 
     ```
+    python3 -m venv venv
+    ```
+
+    Windows
+    ```
     . ./venv/Scripts/activate
+    ```
+
+    Mac
+    ```
+    source venv/bin/activate
     ```
 
 5. Download the required packages
@@ -70,7 +80,7 @@ III. Enter the Local Postgres Datbase with the following command
 (Docker Container: hhub-db)
 
 ```
-psql -h localhost -p 5432 -U $POSTGRES_USER -W
+psql -h localhost -p 5432 -U hhubuser -W
 ```
 Password: literally anything
 
