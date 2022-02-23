@@ -8,10 +8,9 @@ class Layer(db.Model):
 
     layerId = db.Column('LAYER_ID', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sessionId = db.Column('SESSION_ID', UUID(as_uuid=True), db.ForeignKey('SESSIONS.SESSION_ID'), nullable=False)
-    startMeasure = db.Column('START_MEASURE', db.Integer, nullable=False)
-    repeatCount = db.Column('REPEAT_COUNT', db.Integer, nullable=False, default=0)
+    startMeasure = db.Column('START_MEASURE', db.Integer, nullable=False, default=0)
+    repeatCount = db.Column('REPEAT_COUNT', db.Integer, nullable=False, default=1)
     bucketUrl = db.Column('BUCKET_URL', db.String(520), nullable=False)
-    session = db.relationship('Session', lazy=True, uselist=False)
 
     def __init__(self, sessionId, startMeasure, repeatCount, bucketUrl):
         self.sessionId = sessionId

@@ -6,17 +6,18 @@ import uuid
 class UserFriendRequest(db.Model):
     __tablename__ = "USER_FRIEND_REQUESTS"
 
-    userId = db.Column('USER_ID', UUID(as_uuid=True), db.ForeignKey('USERS.USER_ID'), primary_key=True)
-    friendId = db.Column('FRIEND_ID', UUID(as_uuid=True), db.ForeignKey('USERS.USER_ID'), primary_key=True)
-    user = db.relationship('User', uselist=False)
-    friend = db.relationship('User', uselist=False)
+    userFriendId = db.Column('USER_FRIEND_REQUEST_ID', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    userId = db.Column('USER_ID', UUID(as_uuid=True), db.ForeignKey('USERS.USER_ID'), nullable=False)
+    friendId = db.Column('FRIEND_ID', UUID(as_uuid=True), db.ForeignKey('USERS.USER_ID'), nullable=False)
+    user = db.relationship('User', uselist=False, foreign_keys=[userId])
+    friend = db.relationship('User', uselist=False, foreign_keys=[friendId])
 
     def __init__(self, userId, friendId):
         self.userId = userId
         self.friendId = friendId
 
     def __repr__(self):
-        return '<UserFriendRequests %s>' % str(self.friendId)
+        return '<UserFriendRequests %s-%s>' % str(self.userId), str(self.friendId)
 
     __mapper_args__ = {
         'polymorphic_identity':'userFriendRequest',

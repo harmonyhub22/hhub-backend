@@ -15,9 +15,9 @@ class Session(db.Model):
     startTime = db.Column('START_TIME', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     endTime = db.Column('END_TIME', db.DateTime)
     genre = db.relationship('Genre')
-    user1 = db.relationship('User', uselist=False)
-    user2 = db.relationship('User', uselist=False)
-    layers = db.relationship('Layer', backref='session', lazy=True)
+    user1 = db.relationship('User', uselist=False, foreign_keys=[user1Id])
+    user2 = db.relationship('User', uselist=False, foreign_keys=[user2Id])
+    layers = db.relationship('Layer', backref='session', lazy=True, uselist=True)
 
     def __init__(self, genreId, user1Id, user2Id):
         self.genreId = genreId
