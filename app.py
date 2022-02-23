@@ -1,29 +1,19 @@
+# External imports
 import os
 import pathlib
 import google.auth.transport.requests
 import requests
-
 from flask import Flask, session, abort, redirect, request
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
-from oauthlib.oauth2 import WebApplicationClient
 from pip._vendor import cachecontrol
 
 # Internal imports
-#from db import init_db_command
-#from user import User
+from middleware import Test
 
 
 app = Flask(__name__)
-app.secret_key = "CodeSpecialist.com"
-
+app.secret_key = "HarmonyHub"
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -43,6 +33,9 @@ def login_required(function):
             return function()
         
     return wrapper
+
+# middleware
+app.wsgi_app = Test(app.wsgi_app)
 
 @app.route("/login")
 def login():
@@ -88,6 +81,9 @@ def index():
 @login_required
 def protected_area():
     return "Hello World! <a href='/logout'> <button> Logout </button></a>"
+
+#api.add_resource(login, '/login')
+#api.add_resource(protected_area, '/protected_area')
 
 
 if __name__ == "__main__":
