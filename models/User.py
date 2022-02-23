@@ -24,3 +24,6 @@ class User(db.Model):
     __mapper_args__ = {
         'polymorphic_identity':'user',
     }
+
+    def get_id(self):
+        return self.userId

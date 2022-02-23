@@ -1,7 +1,11 @@
-from flask import Flask
+from flask import Flask, request
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from grpc import method_handlers_generic_handler
+from sympy import re
+from flask_socketio import *
+
 import os
 
 app = Flask(__name__)
@@ -32,3 +36,8 @@ def hello_world():
 @app.route("/ping", methods=['GET'])
 def ping():
     return jsonify(success=True)
+
+import seed
+seed()
+
+    
