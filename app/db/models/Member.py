@@ -1,11 +1,19 @@
+from dataclasses import dataclass
 import os
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
+@dataclass
 class Member(db.Model):
 
     __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+
+    memberId: uuid
+    email: str
+    firstname: str
+    lastname: str
+    isOnline: bool
 
     memberId = db.Column('member_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = db.Column('email', db.String(30), unique=True, nullable=False)

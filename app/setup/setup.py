@@ -3,10 +3,12 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
-import sqlalchemy
-from app.controllers.member_controller import member_controller_bp
+from flask_restful import Api
 from app.db.db import db
+from app.db.models.Member import Member
 from app.db.seed.data import seed
+from app.api.MemberApi import MemberApi
+from app.api.GenreApi import GenreApi
 
 
 def create_app(config_file):
@@ -19,6 +21,7 @@ def create_app(config_file):
     load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
+    api = Api(app)
 
     app.config.from_pyfile(config_file)
 
@@ -38,6 +41,9 @@ def create_app(config_file):
 
         seed()
 
-        app.register_blueprint(member_controller_bp, url_prefix='/members')
+        api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
+        api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
+
+        #app.register_blueprint(member_controller_bp, url_prefix='/members')
 
         return app
