@@ -36,7 +36,7 @@ def create_app(config_file):
         
         db.create_all()
 
-        seed()
+        # seed()
 
         app.register_blueprint(member_controller_bp, url_prefix='/members')
 
