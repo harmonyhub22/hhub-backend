@@ -5,7 +5,7 @@ import uuid
 
 class Genre(db.Model):
 
-    #__table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
 
     genreId = db.Column('genre_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column('name', db.String(20), nullable=False)

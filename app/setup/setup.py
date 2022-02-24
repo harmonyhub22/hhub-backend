@@ -28,13 +28,11 @@ def create_app(config_file):
 
         db.drop_all()
 
-        '''
         cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'hhub') + ";"
         db.session.execute(cmd)
         cmd = "SET search_path TO " + os.getenv('SCHEMA', 'hhub') + ";"
         db.session.execute(cmd)
         db.session.commit()
-        '''
         
         db.create_all()
 

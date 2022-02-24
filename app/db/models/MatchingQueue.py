@@ -9,7 +9,7 @@ from app.db.models.Member import Member
 
 class MatchingQueue(db.Model):
 
-    #__table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
 
     matchingQueueId = db.Column('matching_queue_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)

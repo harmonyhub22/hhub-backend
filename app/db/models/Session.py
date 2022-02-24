@@ -9,7 +9,7 @@ from app.db.models.Member import Member
 
 class Session(db.Model):
 
-    #__table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     genreId = db.Column('genre_id', UUID(as_uuid=True), db.ForeignKey(Genre.genreId), nullable=False)
