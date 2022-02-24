@@ -7,7 +7,7 @@ from app.db.models.Member import Member
 
 class MemberFriend(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    #__table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
 
     memberFriendId = db.Column('member_friend_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     member1Id = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)

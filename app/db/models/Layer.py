@@ -7,7 +7,7 @@ from app.db.models.Session import Session
 
 class Layer(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    #__table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
 
     layerId = db.Column('layer_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)
