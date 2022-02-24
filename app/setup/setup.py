@@ -26,7 +26,7 @@ def create_app(config_file):
 
     with app.app_context():
 
-        db.drop_all()
+        #db.drop_all()
 
         cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'hhub') + ";"
         db.session.execute(cmd)
