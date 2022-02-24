@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
@@ -5,9 +6,16 @@ import uuid
 
 from app.db.models.Session import Session
 
+@dataclass
 class Layer(db.Model):
 
     __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+
+    layerId: uuid
+    #session: Session
+    startMeasure: int
+    repeatCount: int
+    bucketUrl: str
 
     layerId = db.Column('layer_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)

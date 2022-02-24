@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 import datetime
 import os
+from xmlrpc.client import DateTime
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -7,9 +9,18 @@ import uuid
 from app.db.models.Genre import Genre
 from app.db.models.Member import Member
 
+@dataclass
 class Session(db.Model):
 
     __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+
+    sessionId: uuid
+    turnCount: int
+    startTime: DateTime
+    endTime: DateTime
+    genre: Genre
+    member1: Member
+    member2: Member
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     genreId = db.Column('genre_id', UUID(as_uuid=True), db.ForeignKey(Genre.genreId), nullable=False)
