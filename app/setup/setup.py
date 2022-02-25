@@ -2,9 +2,8 @@
 
 import os
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, request
+from flask import Flask, flash, jsonify, redirect, request, url_for
 from flask_restful import Api
-from flask_login import LoginManager
 from app.db.db import db
 from app.db.models.Member import Member
 from app.db.seed.data import seed
@@ -27,15 +26,10 @@ def create_app(config_file):
     app = Flask(__name__)
     api = Api(app)
     
-    #Initalize login manager for creating user
-    #login_manager = LoginManager()
-
     app.config.from_pyfile(config_file)
     app.secret_key = 'HarmonyHub' # os.environ.get('SECRET_KEY', 'HarmonyHub')
 
     db.init_app(app)
-    #login_manager.init_app(app)
-    #login_manager.login_view = 'login'
 
     with app.app_context():
 
@@ -50,7 +44,7 @@ def create_app(config_file):
         db.create_all()
 
         seed()
-        
+        print(Member.memberId)
         @app.before_request
         def authenticate():   
             if not checkLogin():
@@ -62,13 +56,36 @@ def create_app(config_file):
             if not checkLogin():
                 print('youre not real')
                 return 404
+            userInfo = getUserCredentials()
+            
+            # How to check if they are already in the database 
+            #member = Member(firstname=userInfo[0], lastname=userInfo[1], email=userInfo[2])
+            #db.session.add(member)
+            #db.session.commit()
             return jsonify({})
-            #getUserCredentials()
+            
+            #return jsonify({})
+        
+        @app.route('/home')
+        def home():
+            return "WELCOME TO HARMONY HUB!"   
+        
+        @app.route('/register', methods=['GET', 'POST'])
+        def register():
+            userInfo = getUserCredentials()
+            print(userInfo)
+            #member = Member(firstname=userInfo[0], lastname=userInfo[1], email=userInfo[2])
+            #db.session.add(member)
+            #db.session.commit()
+            
+            #flash("Thank you for registeration!")
+            #return redirect(url_for('home'))
+                
 
-        api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
-        api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
-        api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
-        api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
+        #api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
+        #api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
+        #api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
+        #api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
 
         #app.register_blueprint(member_controller_bp, url_prefix='/members')
 
