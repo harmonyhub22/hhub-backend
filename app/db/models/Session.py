@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 import datetime
 import os
+from typing import List
 from xmlrpc.client import DateTime
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 from app.db.models.Genre import Genre
+# from app.db.models.Layer import Layer
 from app.db.models.Member import Member
 
 @dataclass
@@ -21,6 +23,7 @@ class Session(db.Model):
     genre: Genre
     member1: Member
     member2: Member
+    # layers: List[Layer]
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     genreId = db.Column('genre_id', UUID(as_uuid=True), db.ForeignKey(Genre.genreId), nullable=False)
@@ -32,7 +35,7 @@ class Session(db.Model):
     genre = db.relationship('Genre', uselist=False, foreign_keys=[genreId])
     member1 = db.relationship('Member', uselist=False, foreign_keys=[member1Id])
     member2 = db.relationship('Member', uselist=False, foreign_keys=[member2Id])
-    layers = db.relationship('Layer', backref='session', lazy=True, uselist=True)
+    # layers = db.relationship('Layer', backref='session', lazy=True, uselist=True)
 
     def __init__(self, genreId, member1Id, member2Id):
         self.genreId = genreId
