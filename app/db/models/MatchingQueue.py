@@ -18,7 +18,7 @@ class MatchingQueue(db.Model):
     timeEntered: DateTime
 
     matchingQueueId = db.Column('matching_queue_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
+    memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False, unique=True)
     timeEntered = db.Column('time_entered', DateTime(timezone=True), nullable=False, server_default=func.now())
     member = db.relationship("Member", uselist=False)
 

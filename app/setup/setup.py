@@ -9,6 +9,8 @@ from app.db.models.Member import Member
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
 from app.api.GenreApi import GenreApi
+from app.api.LayerApi import LayerApi
+from app.api.SessionApi import SessionApi
 
 
 def create_app(config_file):
@@ -43,6 +45,8 @@ def create_app(config_file):
 
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
+        api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
+        api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
 
         #app.register_blueprint(member_controller_bp, url_prefix='/members')
 
