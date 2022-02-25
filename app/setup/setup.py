@@ -2,15 +2,19 @@
 
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Api
+import werkzeug
+from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
 from app.db.models.Member import Member
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
 from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
-from app.api.SessionApi import SessionApi
+from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
+from app.api.CommonApi import CommonApi
+from app.exceptions.ErrorHandler import handle_error
 
 
 def create_app(config_file):
@@ -43,11 +47,19 @@ def create_app(config_file):
 
         seed()
 
+        @app.before_request
+        def test():
+            request.environ['HTTP_MEMBERID'] = '693d350f-9cd0-4812-83c4-f1a98a8100ff'
+
+        app.register_error_handler(Exception, handle_error)
+
+        api.add_resource(CommonApi, '/api/')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
+        api.add_resource(SessionLiveApi, '/api/session/live')
         api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
+        api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
-
-        #app.register_blueprint(member_controller_bp, url_prefix='/members')
+        api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
 
         return app
