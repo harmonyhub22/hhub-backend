@@ -3,7 +3,7 @@ import os
 import pathlib
 import google.auth.transport.requests
 import requests
-from flask import session, abort, redirect, request
+from flask import make_response, session, abort, redirect, request
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
@@ -25,11 +25,19 @@ def login():
 
 def checkLogin():
         
-    #print(request.args.get('state'), session.get('state'))
+    print(request.args.get('state'), session.get('state'))
     print("You need to login or create an account")
     
-    if not session.get("state") == request.args.get("state"):
+    if session.get('state') == request.cookies.get('state'):
+        return True
+    
+    if session.get("state") != request.args.get("state"):
         return False
+    
+    resp = make_response()
+    resp.set_cookie('state', request.args.get('state'))
+    return resp
+    
     return True
     
 def getUserCredentials():
