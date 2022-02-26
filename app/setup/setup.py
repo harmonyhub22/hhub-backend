@@ -1,5 +1,3 @@
-
-
 import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, request
@@ -15,7 +13,7 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
-from app.middleware.GoogleAuth import checkLogin, getUserCredentials, login
+from app.middleware.GoogleAuth import checkLogin, getUserCredentials, login, userLogin
 
 
 
@@ -49,7 +47,7 @@ def create_app(config_file):
         db.create_all()
 
         seed()
-        print(Member.memberId)
+    
         @app.before_request
         def authenticate():   
             if not checkLogin():
@@ -62,34 +60,11 @@ def create_app(config_file):
                 print('youre not real')
                 return 404
             userInfo = getUserCredentials()
+            request.environ['HTTP_MEMBERID'] = userLogin(userInfo)     
             
-            # How to check if they are already in the database 
-            #member = Member(firstname=userInfo[0], lastname=userInfo[1], email=userInfo[2])
-            #db.session.add(member)
-            #db.session.commit()
             return jsonify({})
             
             #return jsonify({})
-        
-        @app.route('/home')
-        def home():
-            return "WELCOME TO HARMONY HUB!"   
-        
-        @app.route('/register', methods=['GET', 'POST'])
-        def register():
-            userInfo = getUserCredentials()
-            print(userInfo)
-            #member = Member(firstname=userInfo[0], lastname=userInfo[1], email=userInfo[2])
-            #db.session.add(member)
-            #db.session.commit()
-            
-            #flash("Thank you for registeration!")
-            #return redirect(url_for('home'))
-                
-
-        @app.before_request
-        def test():
-            request.environ['HTTP_MEMBERID'] = '693d350f-9cd0-4812-83c4-f1a98a8100ff'
 
         app.register_error_handler(Exception, handle_error)
 

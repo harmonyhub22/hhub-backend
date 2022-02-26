@@ -7,7 +7,7 @@ from flask import session, abort, redirect, request
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
-from app.db.models.Member import Member
+from app.services.MemberService import getByEmail, addMember
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
@@ -33,7 +33,7 @@ def checkLogin():
     return True
     
 def getUserCredentials():
-    info_list = []
+    info_dict = dict()
 
     flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials
@@ -52,13 +52,24 @@ def getUserCredentials():
     session["family_name"] = id_info.get("family_name")
     session["email"] = id_info.get("email")
     
-    info_list.append(session["given_name"])
-    info_list.append(session["family_name"])
-    info_list.append(session["email"])
+    info_dict['firstname'] = session["given_name"]
+    info_dict['lastname'] = session["family_name"]
+    info_dict['email'] = session["email"]
     
-    return info_list
+    return info_dict
     
 # CREATE USER WITH SERVICE IF NOT EXISTS
 # IF DOES EXIST ATTACH USER_ID TO HEADER
-
+def userLogin(infoDict):
+    
+    member = getByEmail(infoDict['email'])
+   
+    if not member:
+        member = addMember(infoDict['email'], infoDict['firstname'], infoDict['lastname'])
+        print(member.email)
+        return member.memberId
+    
+    return member.memberId
+    
+    
         

@@ -20,7 +20,7 @@ def getAll():
     return Member.query.all()
 
 def addMember(email, firstname, lastname):
-    db.session.begin()
+    #db.session.begin()
     try:
         member = Member(email, firstname, lastname, isOnline=True)
         db.session.add(member)
