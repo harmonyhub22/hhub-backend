@@ -87,3 +87,5 @@ Password: literally anything
 IV. Trouble connecting to the local database?
 
 Stop the Postgres Service on your local computer.
+
+V. Look at the <a href="https://www.postman.com/orange-capsule-30931/workspace/hhub-backend" target="_blank">Postman Workspace</a> for api endpoint reference.
