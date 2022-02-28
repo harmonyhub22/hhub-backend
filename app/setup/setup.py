@@ -1,13 +1,9 @@
-
-
 import os
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, jsonify, redirect, request, session, send_from_directory
 from flask_restful import Api
-import werkzeug
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
-from app.db.models.Member import Member
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
 from app.api.GenreApi import GenreApi
@@ -15,6 +11,8 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
+from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+
 
 
 def create_app(config_file):
@@ -28,7 +26,7 @@ def create_app(config_file):
 
     app = Flask(__name__)
     api = Api(app)
-
+    
     app.config.from_pyfile(config_file)
 
     db.init_app(app)
@@ -47,9 +45,36 @@ def create_app(config_file):
 
         seed()
 
+        @app.route('/favicon.ico')
+        def favicon():
+            return send_from_directory(app.root_path,
+                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    
         @app.before_request
-        def test():
-            request.environ['HTTP_MEMBERID'] = '693d350f-9cd0-4812-83c4-f1a98a8100ff'
+        def authenticate():
+            print(app.root_path)
+            memberid = getSession()
+            if not memberid and request.path == '/google-login':
+                print('request path is /google-login')
+                return
+            if not memberid:
+                print('you must login')
+                authUrl = login()
+                return redirect(authUrl)
+            request.environ['HTTP_MEMBERID'] = memberid  
+        
+        @app.route('/google-login')
+        def authCallback():
+            print('auth redirect')
+            verifyLogin()
+            getOrCreateMember()   
+            return jsonify({ 'success': True })
+
+        @app.route('/logout')
+        def logout():
+            session.pop('state', default=None)
+            session.pop('memberid', default=None)
+            return jsonify({ 'success': True })
 
         app.register_error_handler(Exception, handle_error)
 
