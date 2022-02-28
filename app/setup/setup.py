@@ -1,9 +1,9 @@
-
-
 import os
+from socket import SocketIO
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_restful import Api
+from flask_cors import CORS
 import werkzeug
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -62,4 +62,19 @@ def create_app(config_file):
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
 
+        @app.route('/newSession', methods=['POST'])
+        @cross_origin
+        def startSession():
+            if request.method == 'POST':
+                data = request.get_json()
+                userId, genreId = data['MEMBERID'], data['GENREID']
+                
+                # TODO: call queue API to get into the queue, then 
+        
+        @SocketIO.on('addlayer')
+        @cross_origin
+        def processLayer():
+            # TODO: process layer metadata (call layer API) and then make another request to save the audio
+            pass
+        
         return app

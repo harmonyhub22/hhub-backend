@@ -62,7 +62,7 @@ def createSession(memberId, data):
     # TODO: Emit on socket to users to go to session
 
 def endSession(memberId, sessionId):
-    # TODO: must save layers into one midi file
+    # TODO: must save layers into one audio file
     # then delete all layer records
     db.session.begin()
 
