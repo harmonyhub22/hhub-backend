@@ -1,7 +1,7 @@
 import os
 from socket import SocketIO
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, request, session, send_from_directory
+from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -13,6 +13,7 @@ from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+from flask_cors import CORS
 
 
 
@@ -26,6 +27,7 @@ def create_app(config_file):
     load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
+    cors = CORS(app, resources={r"/*": {"origins": "*"}})
     api = Api(app)
     
     app.config.from_pyfile(config_file)
@@ -56,13 +58,27 @@ def create_app(config_file):
             print(app.root_path)
             memberid = getSession()
             if not memberid and request.path == '/google-login':
-                print('request path is /google-login')
                 return
             if not memberid:
                 print('you must login')
                 authUrl = login()
                 return redirect(authUrl)
             request.environ['HTTP_MEMBERID'] = memberid  
+        
+        ### CORS section
+        @app.after_request
+        def after_request_func(response):
+            if request.method == 'OPTIONS':
+                response = make_response()
+                response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+                response.headers.add('Access-Control-Allow-Headers', 'x-csrf-token')
+                response.headers.add('Access-Control-Allow-Methods',
+                                    'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Allow-Origin', os.getenv('CORS_ORIGIN'))
+            return response
+        ### end CORS section
+
         
         @app.route('/google-login')
         def authCallback():
@@ -96,9 +112,11 @@ def create_app(config_file):
                 
                 # TODO: call queue API to get into the queue, then 
         
+        '''
         @SocketIO.on('addlayer')
         def processLayer():
             # TODO: process layer metadata (call layer API) and then make another request to save the audio
             pass
+        '''
         
         return app
