@@ -72,6 +72,7 @@ def create_app(config_file):
 
         @app.route('/logout')
         def logout():
+            session.pop('state', default=None)
             session.pop('memberid', default=None)
             return jsonify({ 'success': True })
 

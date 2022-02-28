@@ -13,7 +13,7 @@ from app.services.MemberService import getByEmail, addMember
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
-redirect_path = os.getenv('REDIRECT_PATH', 'http://localhost:5000/')
+redirect_path = os.getenv('REDIRECT_PATH', 'http://localhost:5000/google-login')
 
 flow = Flow.from_client_secrets_file(client_secrets_file=client_secrets_file, 
                                      scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email","openid"],
