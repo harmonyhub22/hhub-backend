@@ -17,8 +17,8 @@ class Member(db.Model):
 
     memberId = db.Column('member_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = db.Column('email', db.String(30), unique=True, nullable=False)
-    firstname = db.Column('first_name', db.String(30), unique=True, nullable=False)
-    lastname = db.Column('last_name', db.String(30), unique=True, nullable=False)
+    firstname = db.Column('first_name', db.String(30), nullable=False)
+    lastname = db.Column('last_name', db.String(30), nullable=False)
     isOnline = db.Column('is_online', db.Boolean, nullable=False)
 
     def __init__(self, email, firstname, lastname, isOnline = True):

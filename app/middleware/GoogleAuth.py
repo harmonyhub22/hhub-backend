@@ -58,12 +58,9 @@ def getOrCreateMember():
    
     if not member:
         member = addMember(email, firstname, lastname)
-        print(member.email)
         return member.memberId
     
     session['memberid'] = member.memberId
-
-    print(member.memberId)
     return session['memberid']
     
     
