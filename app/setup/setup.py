@@ -1,11 +1,9 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, request
+from flask import Flask, jsonify, redirect, request, session, send_from_directory
 from flask_restful import Api
-import werkzeug
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
-from app.db.models.Member import Member
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
 from app.api.GenreApi import GenreApi
@@ -13,7 +11,7 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
-from app.middleware.GoogleAuth import checkLogin, getUserCredentials, login, userLogin
+from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 
 
 
@@ -30,7 +28,6 @@ def create_app(config_file):
     api = Api(app)
     
     app.config.from_pyfile(config_file)
-    app.secret_key = 'HarmonyHub' # os.environ.get('SECRET_KEY', 'HarmonyHub')
 
     db.init_app(app)
 
@@ -47,24 +44,36 @@ def create_app(config_file):
         db.create_all()
 
         seed()
+
+        @app.route('/favicon.ico')
+        def favicon():
+            return send_from_directory(app.root_path,
+                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
     
         @app.before_request
-        def authenticate():   
-            if not checkLogin():
+        def authenticate():
+            print(app.root_path)
+            memberid = getSession()
+            if not memberid and request.path == '/google-login':
+                print('request path is /google-login')
+                return
+            if not memberid:
+                print('you must login')
                 authUrl = login()
                 return redirect(authUrl)
+            request.environ['HTTP_MEMBERID'] = memberid  
         
-        @app.route('/')
+        @app.route('/google-login')
         def authCallback():
-            if not checkLogin():
-                print('youre not real')
-                return 404
-            userInfo = getUserCredentials()
-            request.environ['HTTP_MEMBERID'] = userLogin(userInfo)     
-            
-            return jsonify({})
-            
-            #return jsonify({})
+            print('auth redirect')
+            verifyLogin()
+            getOrCreateMember()   
+            return jsonify({ 'success': True })
+
+        @app.route('/logout')
+        def logout():
+            session.pop('memberid', default=None)
+            return jsonify({ 'success': True })
 
         app.register_error_handler(Exception, handle_error)
 
