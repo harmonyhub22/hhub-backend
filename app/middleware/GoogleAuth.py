@@ -37,7 +37,6 @@ def verifyLogin():
         raise UnauthorizedException('Google Login Failed')
     
 def getOrCreateMember():
-
     flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials
     request_session = requests.session()
@@ -55,8 +54,10 @@ def getOrCreateMember():
     lastname = id_info.get("family_name")
     
     member = getByEmail(email)
+    print("Current member ", member)
    
     if not member:
+        print("You are not in our system")
         member = addMember(email, firstname, lastname)
         return member.memberId
     
