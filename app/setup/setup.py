@@ -93,7 +93,7 @@ def create_app(config_file):
             session.pop('memberid', default=None)
             return jsonify({ 'success': True })
 
-        app.register_error_handler(Exception, handle_error)
+        #app.register_error_handler(Exception, handle_error)
 
         api.add_resource(CommonApi, '/api/')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
