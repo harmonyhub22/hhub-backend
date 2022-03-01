@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, request, session, send_from_directory
+from flask_uploads import configure_uploads
 from flask_restful import Api
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -12,6 +13,8 @@ from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+from app.fileupload.FileUpload import FileUpload
+from app.fileupload.FileHelper import FILE_SET
 
 
 
@@ -28,8 +31,12 @@ def create_app(config_file):
     api = Api(app)
     
     app.config.from_pyfile(config_file)
+    app.config['UPLOADED_FILES_DEST']= os.getcwd()
 
     db.init_app(app)
+    
+    MAX_CONTENT_LENGTH = 10 * 1020 * 1024
+    configure_uploads(app, FILE_SET)
 
     with app.app_context():
 
@@ -52,8 +59,8 @@ def create_app(config_file):
     
         @app.before_request
         def authenticate():
-            print(app.root_path)
             memberid = getSession()
+            print("The member ID is ", memberid)
             if not memberid and request.path == '/google-login':
                 print('request path is /google-login')
                 return
@@ -61,10 +68,13 @@ def create_app(config_file):
                 print('you must login')
                 authUrl = login()
                 return redirect(authUrl)
-            request.environ['HTTP_MEMBERID'] = memberid  
+            request.environ['HTTP_MEMBERID'] = memberid 
         
         @app.route('/google-login')
         def authCallback():
+            if not request.args.get('state'):
+                authUrl = login()
+                return redirect(authUrl)
             print('auth redirect')
             verifyLogin()
             getOrCreateMember()   
@@ -72,9 +82,12 @@ def create_app(config_file):
 
         @app.route('/logout')
         def logout():
-            session.pop('state', default=None)
-            session.pop('memberid', default=None)
+            session.clear()
             return jsonify({ 'success': True })
+    
+        @app.route('/')
+        def home():
+            return "<h1>Welcome to hhub backend</h1>"
 
         #app.register_error_handler(Exception, handle_error)
 
@@ -86,5 +99,6 @@ def create_app(config_file):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
+        api.add_resource(FileUpload, '/api/upload/file')
 
         return app

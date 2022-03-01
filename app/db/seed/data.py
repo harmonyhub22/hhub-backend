@@ -12,9 +12,9 @@ def seed():
     s = db.session()
 
     member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri')
-    member2 = Member('vi@tamu.edu', 'Vi', 'Truong')
+    member2 = Member('vitruong00@tamu.edu', 'Vi', 'Truong')
     member3 = Member('will@tamu.edu', 'Will', 'Thomas')
-    member4 = Member('dean@tamu.edu', 'Dean', 'Something')
+    member4 = Member('dean27@tamu.edu', 'Dean', 'Something')
     member1.memberId = uuid.UUID('693d350f-9cd0-4812-83c4-f1a98a8100ff')
     member2.memberId = uuid.UUID('0dfedda5-ddd3-481f-90d9-6ee388c4093e')
     member3.memberId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
