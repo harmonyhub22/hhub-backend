@@ -1,5 +1,7 @@
 import os
-from socket import SocketIO
+from venv import create
+#from socket import SocketIO
+from flask_socketio import SocketIO, send, emit
 from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
@@ -11,6 +13,8 @@ from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
+from app.services.MatchingQueueService import getAll
+from app.services.SessionService import createSession
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from flask_cors import CORS
@@ -55,13 +59,14 @@ def create_app(config_file):
     
         @app.before_request
         def authenticate():
-            print(app.root_path)
+            #print(app.root_path)
             memberid = getSession()
             if not memberid and request.path == '/google-login':
                 return
             if not memberid:
                 print('you must login')
                 authUrl = login()
+                print("DEBUG: " + authUrl)
                 return redirect(authUrl)
             request.environ['HTTP_MEMBERID'] = memberid  
         
@@ -103,20 +108,47 @@ def create_app(config_file):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
-
-        @app.route('/newSession', methods=['POST'])
-        def startSession():
-            if request.method == 'POST':
-                data = request.get_json()
-                userId, genreId = data['MEMBERID'], data['GENREID']
-                
-                # TODO: call queue API to get into the queue, then 
         
-        '''
-        @SocketIO.on('addlayer')
+        @socketio.on('addlayer')
         def processLayer():
             # TODO: process layer metadata (call layer API) and then make another request to save the audio
             pass
-        '''
+        
+        # web socket listener for when the user joins the queue
+        @socketio.on('connect')
+        def joinQueueConnect():
+            # if there are 2 users in the queue, create the session with them
+            allQueuedUsers = getAll()
+            if len(allQueuedUsers) >= 2:
+                member1 = allQueuedUsers[0]
+                member2 = allQueuedUsers[1]
+                data = {
+                    'genreId': 'dff3c144-eb29-41d3-82ea-9bcd200fc891',  # default of Alt genre for now (change later)
+                    'memberId': member2
+                }
+                newSession = createSession(member1, data)
+                emit('session_made', { 'sessionId': newSession.sessionId })
+            else:
+                return
+            
+        # web socket listener for joining a session
+        @socketio.on('join')
+        def onJoin(data):
+            username = data['fullName']
+            room = data['sessionId']
+            join_room(room)
+            send(username + ' has entered the session!', to=room)
+        
+        # web socket listener for leaving a session
+        @socketio.on('leave')
+        def onLeave(data):
+            username = data['fullName']
+            room = data['sessionId']
+            leave_room(room)
+            send(username + ' has left the session!', to=room)
+        
+        @socketio.on('disconnect')
+        def leaveSessionDisconnect():
+            print('DEBUG: user disconnected')
         
         return app

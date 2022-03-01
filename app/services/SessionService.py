@@ -59,8 +59,6 @@ def createSession(memberId, data):
         db.session.rollback()
         raise ServerErrorException('cannot create Session')
 
-    # TODO: Emit on socket to users to go to session
-
 def endSession(memberId, sessionId):
     # TODO: must save layers into one audio file
     # then delete all layer records
