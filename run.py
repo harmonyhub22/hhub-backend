@@ -1,6 +1,7 @@
 from app.app import app
+import eventlet
 
-awesome_app = app
+harmonyHub = app
 
 if __name__ == '__main__':
-    awesome_app.run()
+    harmonyHub.run()
