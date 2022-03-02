@@ -29,7 +29,7 @@ def create_app(config_file):
     load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
-    sio = socketio.Server()
+    sio = socketio.Server(cors_allowed_origin='*')
     cors = CORS(app, resources={r"/*": {"origins": "*"}})
     api = Api(app)
     app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
