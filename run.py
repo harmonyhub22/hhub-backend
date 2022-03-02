@@ -4,4 +4,4 @@ import eventlet
 harmonyHub = app
 
 if __name__ == '__main__':
-    harmonyHub.run()
+    harmonyHub.run(threaded=True)
