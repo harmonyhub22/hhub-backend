@@ -7,6 +7,7 @@ from app.db.models.MemberFriendRequest import MemberFriendRequest
 from app.db.models.Session import Session
 from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Layer import Layer
+from app.db.models.Song import Song
 
 def seed():
     s = db.session()
@@ -66,5 +67,12 @@ def seed():
     layer1 = Layer(session1.sessionId, member1.memberId, 0, 1, 'something.com')
     layer1.layerId = '650c0a24-5aab-4c79-990a-61493cd146dc'
     s.add(layer1)
+
+    s.commit()
+
+    # songs
+    song1 = Song(session1.sessionId, 'Some song', 60, 'something.com', 120)
+    song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
+    s.add(song1)
 
     s.commit()
