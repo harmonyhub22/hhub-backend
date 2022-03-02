@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, request, session, send_from_directory
-from flask_uploads import configure_uploads
 from flask_restful import Api
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -11,10 +10,9 @@ from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
+from app.api.SongApi import SongApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
-from app.fileupload.FileUpload import FileUpload
-from app.fileupload.FileHelper import FILE_SET
 
 
 
@@ -34,9 +32,6 @@ def create_app(config_file):
     app.config['UPLOADED_FILES_DEST']= os.getcwd()
 
     db.init_app(app)
-    
-    MAX_CONTENT_LENGTH = 10 * 1020 * 1024
-    configure_uploads(app, FILE_SET)
 
     with app.app_context():
 
@@ -89,7 +84,7 @@ def create_app(config_file):
         def home():
             return "<h1>Welcome to hhub backend</h1>"
 
-        #app.register_error_handler(Exception, handle_error)
+        app.register_error_handler(Exception, handle_error)
 
         api.add_resource(CommonApi, '/api/')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
@@ -99,6 +94,6 @@ def create_app(config_file):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
-        api.add_resource(FileUpload, '/api/upload/file')
+        api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
         return app
