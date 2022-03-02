@@ -3,7 +3,7 @@ from venv import create
 import socketio
 # from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, request, session, send_from_directory
+from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -39,9 +39,6 @@ def create_app(config_file):
     app.config['UPLOADED_FILES_DEST']= os.getcwd()
 
     db.init_app(app)
-    
-    MAX_CONTENT_LENGTH = 10 * 1020 * 1024
-    configure_uploads(app, FILE_SET)
 
     with app.app_context():
         db.drop_all()
