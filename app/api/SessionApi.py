@@ -29,10 +29,12 @@ class SessionApi(Resource):
             raise BadRequestException('no session with this member')
         return jsonify(memberSessions)
 
+    '''
     def post(self):
         data = request.get_json(force=True)
         memberId = request.headers['MEMBERID']
         return jsonify(createSession(memberId, data))
+    '''
 
 class SessionEndApi(Resource):
 

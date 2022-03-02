@@ -22,7 +22,7 @@ class MatchingQueueApi(Resource):
 
     def post(self):
         memberId = request.headers['MEMBERID']
-        return jsonify(join(memberId))
+        return jsonify(joinOrAttemptMatch(memberId))
 
     def delete(self):
         memberId = request.headers['MEMBERID']

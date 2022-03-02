@@ -24,17 +24,16 @@ def getAll():
 def getLiveSession(memberId):
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
-def createSession(memberId, data):
-    member2Id = data['memberId']
-    genreId = data['genreId']
+def createSession(member1Id, member2Id, genreId):
 
     db.session.begin()
 
+    member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
-    if not member2:
-        print('memberId does not exist')
-        raise BadRequestException('memberId does not exist')
-    if member2Id == memberId:
+    if not member2 or not member1:
+        print('member does not exist')
+        raise BadRequestException('member does not exist')
+    if member2Id == member1Id:
         print('cannot start a session with yourself')
         raise BadRequestException('cannot start session with yourself')
 
@@ -43,15 +42,15 @@ def createSession(memberId, data):
         print('genreId does not exist')
         raise BadRequestException('genreId does not exist')
 
-    existing_session = Session.query.filter((Session.member1Id==memberId) | (Session.member2Id==memberId)
-                                         | (Session.member1Id==member2Id) | (Session.member2Id==member2Id)).first()
+    existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
+                                         | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
         print('Someone is already in a session')
         raise BadRequestException('you or other member is already in a Session')
 
     # create new session
     try:
-        record = Session(genreId, memberId, member2Id)
+        record = Session(genreId, member1Id, member2Id)
         db.session.add(record)
         db.session.commit()
         return record
