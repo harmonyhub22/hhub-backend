@@ -59,7 +59,6 @@ def getOrCreateMember():
     if not member:
         print("You are not in our system")
         member = addMember(email, firstname, lastname)
-        return member.memberId
     
     session['memberid'] = member.memberId
     return session['memberid']
