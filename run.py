@@ -1,8 +1,7 @@
 from app.app import app
-from flask_socketio import SockketIO
+import eventlet
 
-awesome_app = app
+harmonyHub = app
 
 if __name__ == '__main__':
-    socketio.run(awesome_app)
-    #awesome_app.run()
+    harmonyHub.run()
