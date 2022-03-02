@@ -23,15 +23,7 @@ class SongApi(Resource):
             return jsonify(getByName(name))
         return jsonify(getAll())
 
-    '''
-    def post(self, sessionId, id=None):
-        data = request.get_json(force=True)
+    def delete(self, id):
         memberId = request.headers['MEMBERID']
         memberId = uuid.UUID(memberId)
-        return jsonify(addOrEditLayer(sessionId, memberId, data, id))
-
-    def delete(self, sessionId, id):
-        memberId = request.headers['MEMBERID']
-        memberId = uuid.UUID(memberId)
-        return jsonify(deleteLayer(sessionId, memberId, id))
-    '''
+        return jsonify(deleteSong(id, memberId))
