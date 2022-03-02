@@ -3,7 +3,7 @@ from venv import create
 import socketio
 # from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from dotenv import load_dotenv
-from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
+from flask import Flask, jsonify, redirect, request, session, send_from_directory
 from flask_restful import Api
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
@@ -18,6 +18,8 @@ from app.services.SessionService import createSession
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from flask_cors import CORS
+
+
 
 def create_app(config_file):
     """
@@ -34,8 +36,12 @@ def create_app(config_file):
     api = Api(app)
     app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
     app.config.from_pyfile(config_file)
+    app.config['UPLOADED_FILES_DEST']= os.getcwd()
 
     db.init_app(app)
+    
+    MAX_CONTENT_LENGTH = 10 * 1020 * 1024
+    configure_uploads(app, FILE_SET)
 
     with app.app_context():
         db.drop_all()
@@ -57,8 +63,8 @@ def create_app(config_file):
     
         @app.before_request
         def authenticate():
-            #print(app.root_path)
             memberid = getSession()
+            print("The member ID is ", memberid)
             if not memberid and request.path == '/google-login':
                 return
             if not memberid:
@@ -66,7 +72,7 @@ def create_app(config_file):
                 authUrl = login()
                 print("DEBUG: " + authUrl)
                 return redirect(authUrl)
-            request.environ['HTTP_MEMBERID'] = memberid  
+            request.environ['HTTP_MEMBERID'] = memberid 
         
         ### CORS section
         @app.after_request
@@ -85,6 +91,9 @@ def create_app(config_file):
         
         @app.route('/google-login')
         def authCallback():
+            if not request.args.get('state'):
+                authUrl = login()
+                return redirect(authUrl)
             print('auth redirect')
             verifyLogin()
             getOrCreateMember()   
@@ -92,11 +101,14 @@ def create_app(config_file):
 
         @app.route('/logout')
         def logout():
-            session.pop('state', default=None)
-            session.pop('memberid', default=None)
+            session.clear()
             return jsonify({ 'success': True })
+    
+        @app.route('/')
+        def home():
+            return "<h1>Welcome to hhub backend</h1>"
 
-        app.register_error_handler(Exception, handle_error)
+        #app.register_error_handler(Exception, handle_error)
 
         api.add_resource(CommonApi, '/api/')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
