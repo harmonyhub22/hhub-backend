@@ -12,7 +12,7 @@ from app.services.MemberService import getByEmail, addMember
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-redirect_path = str(os.getenv('SERVER_DOMAIN', 'http://localhost:5000') + os.getenv('REDIRECT_PATH', '/google-login'))
+redirect_path = str(os.getenv('SERVER_DOMAIN', 'http://localhost:5000') + os.getenv('REDIRECT_PATH', 'google-login'))
 
 client_config = dict()
 client_config['web'] = {
