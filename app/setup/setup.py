@@ -100,6 +100,10 @@ def create_app(config_file):
         def home():
             return "<h1>Welcome to hhub backend</h1>"
 
+        @app.errorhandler(404)
+        def page_not_found(e):
+            return '<h4>Route not found: ' + str(request.path) + '<h4>'
+
         app.register_error_handler(Exception, handle_error)
 
         # add all restful api routes
