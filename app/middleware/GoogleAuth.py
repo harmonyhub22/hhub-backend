@@ -12,12 +12,22 @@ from app.services.MemberService import getByEmail, addMember
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
-redirect_path = os.getenv('REDIRECT_PATH', 'http://localhost:5000/google-login')
+redirect_path = str(os.getenv('SERVER_DOMAIN', 'http://localhost:5000') + os.getenv('REDIRECT_PATH', '/google-login'))
 
-flow = Flow.from_client_secrets_file(client_secrets_file=client_secrets_file, 
-                                     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email","openid"],
-                                     redirect_uri=redirect_path)
+client_config = dict()
+client_config['web'] = {
+    'client_id': os.getenv('CLIENT_ID'),
+    'project_id': os.getenv('PROJECT_ID'),
+    'auth_uri': os.getenv('AUTH_URI'),
+    'token_uri': os.getenv('TOKEN_URI'),
+    'auth_provider_x509_cert_url': os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+    'client_secret': os.getenv('CLIENT_SECRET'),
+    'redirect_uris': os.getenv('REDIRECT_URIS', ['http://localhost:5000/google-login'])
+}
+
+flow = Flow.from_client_config(client_config=client_config, 
+                                scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email","openid"],
+                                redirect_uri=redirect_path)
 
 def getSession():
     try:
