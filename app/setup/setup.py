@@ -13,6 +13,7 @@ from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+from app.services.MemberService import getById
 from app.socket.init import sio
 
 def create_app(config_file):
@@ -61,7 +62,7 @@ def create_app(config_file):
             print("The member ID is ", memberid)
             if not memberid and request.path == '/google-login':
                 return
-            if not memberid:
+            if not memberid or (getById(memberid) == None):
                 print('you must login')
                 authUrl = login()
                 print("DEBUG: " + authUrl)
