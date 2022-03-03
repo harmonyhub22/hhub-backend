@@ -56,16 +56,18 @@ def create_app(config_file):
     
         @app.before_request
         def authenticate():
-            memberid = getSession()
             print("The member ID is ", memberid)
-            if not memberid and request.path == '/google-login':
+            if request.path == '/logout': # let them logout no matter what
                 return
-            if not memberid:
+            memberid = getSession()
+            if not memberid and request.path == '/google-login': # don't check for session when google redirects
+                return
+            if not memberid: # check for session
                 print('you must login')
                 authUrl = login()
                 print("DEBUG: " + authUrl)
                 return redirect(authUrl)
-            if getById(memberid) == None:
+            if getById(memberid) == None: # the database doesn't have them so logout
                 return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid 
         
