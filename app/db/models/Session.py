@@ -35,7 +35,7 @@ class Session(db.Model):
     genre = db.relationship('Genre', uselist=False, foreign_keys=[genreId])
     member1 = db.relationship('Member', uselist=False, foreign_keys=[member1Id])
     member2 = db.relationship('Member', uselist=False, foreign_keys=[member2Id])
-    layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True)
+    layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
 
     def __init__(self, genreId, member1Id, member2Id):
         self.genreId = genreId
