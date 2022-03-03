@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from app.services.MemberService import *
 
@@ -25,12 +25,3 @@ class MemberApi(Resource):
         if email != None:
             return jsonify(getByEmail(email))
         return jsonify(getAll())
-    
-    def put(self):
-        data = request.get_json(force=True)
-        memberId = request.headers['MEMBERID']
-        return jsonify(editMember(memberId, data))
-
-    def delete(self, id):
-        memberId = request.headers['MEMBERID']
-        return jsonify(deleteMember(memberId))

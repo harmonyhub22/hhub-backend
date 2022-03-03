@@ -60,11 +60,13 @@ def create_app(config_file):
             print("The member ID is ", memberid)
             if not memberid and request.path == '/google-login':
                 return
-            if not memberid or (getById(memberid) == None):
+            if not memberid:
                 print('you must login')
                 authUrl = login()
                 print("DEBUG: " + authUrl)
                 return redirect(authUrl)
+            if getById(memberid) == None:
+                return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid 
         
         ### CORS section
@@ -90,12 +92,12 @@ def create_app(config_file):
             print('auth redirect')
             verifyLogin()
             getOrCreateMember()   
-            return jsonify({ 'success': True })
-
+            return jsonify({ 'logged-in': True })
+        
         @app.route('/logout')
         def logout():
             session.clear()
-            return jsonify({ 'success': True })
+            return jsonify({ 'logged-out': True })
     
         @app.route('/')
         def home():
