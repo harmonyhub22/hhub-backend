@@ -56,7 +56,6 @@ def create_app(config_file):
     
         @app.before_request
         def authenticate():
-            print("The member ID is ", memberid)
             if request.path == '/logout': # let them logout no matter what
                 return
             memberid = getSession()
