@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT run:sio
+web: gunicorn --bind 0.0.0.0:$PORT run:awesomeapp

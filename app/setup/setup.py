@@ -36,8 +36,6 @@ def create_app(config_file):
     sio.init_app(app, cors_allowed_origins=os.getenv('CORS_ORIGIN'), async_mode='threading')
 
     with app.app_context():
-        '''
-        db.drop_all()
 
         cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'hhub') + ";"
         db.session.execute(cmd)
@@ -46,7 +44,6 @@ def create_app(config_file):
         db.session.commit()
         
         db.create_all()
-        '''
 
         seed()
 
