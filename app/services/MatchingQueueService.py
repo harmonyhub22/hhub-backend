@@ -29,7 +29,6 @@ def match(member1Id): # if there are 2 users in the queue, create the session wi
     return newSession
 
 def joinOrAttemptMatch(memberId):
-    db.session.begin()
     existing_record = getByMemberId(memberId)
     if existing_record != None:
         return existing_record
@@ -52,7 +51,6 @@ def joinOrAttemptMatch(memberId):
 
 
 def leave(memberId):
-    db.session.begin()
     existing_record = getByMemberId(memberId)
     if existing_record != None:
         try:

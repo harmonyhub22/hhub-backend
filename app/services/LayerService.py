@@ -13,7 +13,6 @@ def getAllBySessionId(sessionId):
     return Layer.query.filter(Layer.sessionId==sessionId).all()
 
 def addOrEditLayer(sessionId, memberId, data, layerId=None):
-    db.session.begin()
 
     session = getSessionById(sessionId)
     if session.member1Id != memberId and session.member2Id != memberId:
@@ -43,8 +42,6 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
         raise ServerErrorException('could not edit layer')
 
 def deleteLayer(sessionId, memberId, layerId):
-
-    db.session.begin()
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
         raise BadRequestException('you cannot delete this layer')

@@ -24,7 +24,6 @@ def createSong(sessionId, memberId):
     pass
 
 def deleteSong(songId, memberId):
-    db.session.begin()
     song = Song.query.get(songId)
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
         raise UnauthorizedException('you cannot delete this song')

@@ -20,7 +20,6 @@ def getAll():
     return Member.query.all()
 
 def addMember(email, firstname, lastname):
-    #db.session.begin()
     try:
         member = Member(email, firstname, lastname, isOnline=True)
         db.session.add(member)
@@ -33,7 +32,6 @@ def addMember(email, firstname, lastname):
 def editMember(id, data):
     firstname = data['firstname']
     lastname = data['lastname']
-    db.session.begin()
     try:
         member = getById(id)
         member.firstname = firstname
@@ -46,7 +44,6 @@ def editMember(id, data):
         raise ServerErrorException('could not edit member')
 
 def deleteMember(memberId):
-    db.session.begin()
     try:
         member = Member.query.get(memberId)
         db.session.delete(member)

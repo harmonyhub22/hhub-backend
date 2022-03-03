@@ -25,9 +25,6 @@ def getLiveSession(memberId):
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
 def createSession(member1Id, member2Id, genreId):
-
-    db.session.begin()
-
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     if not member2 or not member1:
@@ -48,7 +45,6 @@ def createSession(member1Id, member2Id, genreId):
         print('Someone is already in a session')
         raise BadRequestException('you or other member is already in a Session')
 
-    # create new session
     try:
         record = Session(genreId, member1Id, member2Id)
         db.session.add(record)
@@ -61,8 +57,6 @@ def createSession(member1Id, member2Id, genreId):
 def endSession(memberId, sessionId):
     # TODO: must save layers into one audio file
     # then delete all layer records
-    db.session.begin()
-
     session = Session.query.get(sessionId)
     memberId = uuid.UUID(memberId)
     if session == None or (session.member1Id != memberId and session.member2Id != memberId):
