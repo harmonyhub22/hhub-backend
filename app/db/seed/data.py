@@ -53,7 +53,7 @@ def seed():
     queue1 = MatchingQueue(member2.memberId)
     queue1.matchingQueueId = '1c74a6fd-b7b9-4fe4-96fd-f7e78eb6d2c2'
     s.add(queue1) # vi joins the queue
-    s.add(MatchingQueue(member3.memberId)) # will joins the queue
+    #s.add(MatchingQueue(member3.memberId)) # will joins the queue
 
     # sessions
     session1 = Session(genre1.genreId, member1.memberId, member4.memberId) # greg and dean join a session

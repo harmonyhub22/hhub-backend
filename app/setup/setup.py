@@ -1,5 +1,4 @@
 import os
-import socketio
 from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
@@ -13,10 +12,7 @@ from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
-from flask_cors import CORS
 from app.socket.init import sio
-
-
 
 def create_app(config_file):
     """
@@ -29,16 +25,15 @@ def create_app(config_file):
 
     app = Flask(__name__)
 
-    cors = CORS(app, resources={r"/*": {"origins": os.getenv('CORS_ORIGIN')}})
-
     # rest api
     api = Api(app)
     app.config.from_pyfile(config_file)
 
-    # sockets
-    app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
-
+    # database
     db.init_app(app)
+
+    # sockets
+    sio.init_app(app, cors_allowed_origins=os.getenv('CORS_ORIGIN'), async_mode='threading')
 
     with app.app_context():
         db.drop_all()
@@ -107,6 +102,7 @@ def create_app(config_file):
 
         app.register_error_handler(Exception, handle_error)
 
+        # add all restful api routes
         api.add_resource(CommonApi, '/api/')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
@@ -115,5 +111,10 @@ def create_app(config_file):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
-        
+
+        @sio.on('connect')
+        def connect():
+            sid = request.sid      
+            print('sid', sid)
+
         return app

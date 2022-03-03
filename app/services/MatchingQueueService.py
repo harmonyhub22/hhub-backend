@@ -4,7 +4,7 @@ from app.db.db import db
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.services.SessionService import createSession
-from app.socket.utils import addToRoom, getSids
+from app.socket.utils import addToRoom, emitMessageToRoom, getSids
 
 def getById(id):
     return MatchingQueue.query.get(id)
@@ -45,8 +45,9 @@ def joinOrAttemptMatch(memberId):
     else:
         session = match(memberId)
         sid1, sid2 = getSids(session.member1.memberId, session.member2.memberId)
-        addToRoom(sid1, 'session=' + str(session.sessionId))
-        addToRoom(sid2, 'session=' + str(session.sessionId))
+        addToRoom(sid1, 'session='+str(session.sessionId))
+        addToRoom(sid2, 'session='+str(session.sessionId))
+        emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session='+str(session.sessionId))
         return None
 
 

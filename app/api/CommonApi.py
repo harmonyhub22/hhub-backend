@@ -9,5 +9,4 @@ class CommonApi(Resource):
 
     def get(self):
         memberId = request.headers['MEMBERID']
-        print('common')
         return jsonify(getMemberById(memberId))
