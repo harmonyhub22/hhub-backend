@@ -11,6 +11,10 @@ from app.db.models.Layer import Layer
 def seed():
     s = db.session()
 
+    if Member.query.filter(Member.email=='gcpetri@tamu.edu').first() != None: 
+        # seed data is already present
+        return
+
     member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri')
     member2 = Member('vitruong00@tamu.edu', 'Vi', 'Truong')
     member3 = Member('will@tamu.edu', 'Will', 'Thomas')
