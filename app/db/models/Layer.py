@@ -4,7 +4,6 @@ from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from app.db.models.Member import Member
-from app.db.models.Session import Session
 
 @dataclass
 class Layer(db.Model):
@@ -16,16 +15,15 @@ class Layer(db.Model):
     repeatCount: int
     bucketUrl: str
     member: Member
-    session: Session
+    sessionId: uuid
 
     layerId = db.Column('layer_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)
+    sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey('public.session.session_id'), nullable=False)
     memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     startMeasure = db.Column('start_measure', db.Integer, nullable=False, default=0)
     repeatCount = db.Column('repeat_count', db.Integer, nullable=False, default=1)
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
     member = db.relationship('Member', uselist=False, lazy='subquery')
-    session = db.relationship('Session', uselist=False, lazy='subquery')
 
     def __init__(self, sessionId, memberId, startMeasure, repeatCount, bucketUrl):
         self.sessionId = sessionId

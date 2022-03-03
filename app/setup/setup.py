@@ -10,6 +10,7 @@ from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
+from app.api.SongApi import SongApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from app.socket.init import sio
@@ -110,6 +111,7 @@ def create_app(config_file):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
+        api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
         @sio.on('connect')
         def connect():
