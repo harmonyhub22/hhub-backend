@@ -9,7 +9,7 @@ from app.db.models.Member import Member
 @dataclass
 class MemberFriend(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     memberFriendId: uuid
     member1: Member

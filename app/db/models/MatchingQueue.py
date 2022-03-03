@@ -11,7 +11,7 @@ from app.db.models.Member import Member
 @dataclass
 class MatchingQueue(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     matchingQueueId: uuid
     member: Member

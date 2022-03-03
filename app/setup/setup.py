@@ -38,9 +38,9 @@ def create_app(config_file):
 
     with app.app_context():
 
-        cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'hhub') + ";"
+        cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'public') + ";"
         db.session.execute(cmd)
-        cmd = "SET search_path TO " + os.getenv('SCHEMA', 'hhub') + ";"
+        cmd = "SET search_path TO " + os.getenv('SCHEMA', 'public') + ";"
         db.session.execute(cmd)
         db.session.commit()
         

@@ -15,7 +15,7 @@ from app.db.models.Session import Session
 @dataclass
 class Song(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     songId: uuid
     session: Session

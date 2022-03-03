@@ -14,7 +14,7 @@ from app.db.models.Member import Member
 @dataclass
 class Session(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     sessionId: uuid
     turnCount: int

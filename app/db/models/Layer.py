@@ -8,7 +8,7 @@ from app.db.models.Member import Member
 @dataclass
 class Layer(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     layerId: uuid
     startMeasure: int

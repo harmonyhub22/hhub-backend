@@ -7,7 +7,7 @@ import uuid
 @dataclass
 class Genre(db.Model):
 
-    __table_args__ = {'schema':os.getenv('SCHEMA', 'hhub')}
+    __table_args__ = {'schema':os.getenv('SCHEMA', 'public')}
 
     genreId: uuid
     name: str
