@@ -69,8 +69,7 @@ def create_app(config_file):
                 #return redirect(authUrl)
                 return jsonify({ 'url': authUrl }), 302
             if getById(memberid) == None: # the database doesn't have them so logout
-                #return redirect('/logout')
-                return jsonify({ 'url': str(os.getenv('SERVER_DOMAIN') + 'logout') }), 302
+                return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid
         
         ### CORS section
