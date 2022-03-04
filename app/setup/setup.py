@@ -66,8 +66,8 @@ def create_app(config_file):
             if not memberid: # check for session
                 print('you must login')
                 authUrl = login()
-                #return redirect(authUrl)
-                return jsonify({ 'url': authUrl }), 302
+                return redirect(authUrl)
+                #return jsonify({ 'url': authUrl }), 302
             if getById(memberid) == None: # the database doesn't have them so logout
                 return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid
@@ -93,10 +93,10 @@ def create_app(config_file):
                 authUrl = login()
                 return jsonify({ 'url': authUrl }), 302
             print('auth redirect')
-            #verifyLogin()
+            verifyLogin()
             getOrCreateMember()
-            return redirect(os.getenv('CORS_ORIGIN'))
-            #return jsonify({ 'success': True })
+            #return redirect(os.getenv('CORS_ORIGIN'))
+            return jsonify({ 'success': True })
         
         @app.route('/logout')
         def logout():
