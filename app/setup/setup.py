@@ -93,7 +93,7 @@ def create_app(config_file):
                 authUrl = login()
                 return jsonify({ 'url': authUrl }), 302
             print('auth redirect')
-            verifyLogin()
+            #verifyLogin()
             getOrCreateMember()   
             return jsonify({ 'success': True })
         
