@@ -3,4 +3,4 @@ from app.app import app, sio
 
 if __name__ == "__main__":
     print('in main')
-    sio.run(app)#, port=os.getenv('PORT', 5000))
+    sio.run(app)
