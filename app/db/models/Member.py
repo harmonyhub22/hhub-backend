@@ -20,6 +20,7 @@ class Member(db.Model):
     firstname = db.Column('first_name', db.String(30), nullable=False)
     lastname = db.Column('last_name', db.String(30), nullable=False)
     isOnline = db.Column('is_online', db.Boolean, nullable=False)
+    sid = db.Column('sid', db.String(50), nullable=True, unique=True)
 
     def __init__(self, email, firstname, lastname, isOnline = True):
         self.email = email

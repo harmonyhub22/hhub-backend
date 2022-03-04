@@ -3,9 +3,9 @@ from app.db.models.MatchingQueue import MatchingQueue
 from app.db.db import db
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
-from app.services.SessionService import createSession
+from app.services.MemberService import getSid
+from app.services.SessionService import createSession, getLiveSession
 from app.socket.init import addToRoom, emitMessageToRoom
-from app.socket.utils import getSids
 
 def getById(id):
     return MatchingQueue.query.get(id)
@@ -30,10 +30,14 @@ def match(member1Id): # if there are 2 users in the queue, create the session wi
     return newSession
 
 def joinOrAttemptMatch(memberId):
+    liveSession = getLiveSession(memberId)
+    if liveSession != None:
+        raise BadRequestException('you are currently in a session')
     existing_record = getByMemberId(memberId)
-    if existing_record != None:
-        return existing_record
     if len(getTop2()) < 2:
+        print('only 1 in queue')
+        if existing_record != None:
+            return existing_record
         try:
             record = MatchingQueue(memberId)
             db.session.add(record)
@@ -43,8 +47,10 @@ def joinOrAttemptMatch(memberId):
             db.session.rollback()
             raise ServerErrorException('could not add you to the queue')
     else:
+        print('2 in queue')
         session = match(memberId)
-        sid1, sid2 = getSids(session.member1.memberId, session.member2.memberId)
+        sid1 = getSid(session.member1.memberId)
+        sid2 = getSid(session.member2.memberId)
         addToRoom(sid1, 'session='+str(session.sessionId))
         addToRoom(sid2, 'session='+str(session.sessionId))
         emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session='+str(session.sessionId))

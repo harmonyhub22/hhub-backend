@@ -45,10 +45,37 @@ def editMember(id, data):
 
 def deleteMember(memberId):
     try:
-        member = Member.query.get(memberId)
+        member = getById(memberId)
         db.session.delete(member)
         db.session.commit()
         return member
     except Exception:
         db.session.rollback()
         raise ServerErrorException('could not delete member')
+
+# web socket utils
+def getSid(memberId):
+    return getById(memberId).sid
+
+def setSid(memberId, sid):
+    try:
+        member = getById(memberId)
+        member.sid = sid
+        db.session.commit()
+        return member.sid
+    except Exception:
+        db.session.rollback()
+        raise ServerErrorException('could not add sid to member')
+
+def updateSid(memberId, sid=None):
+    try:
+        member = getById(memberId)
+        member.sid = sid
+        db.session.commit()
+        return member.sid
+    except Exception:
+        db.session.rollback()
+        raise ServerErrorException('could not add sid to member')
+
+def getMemberIdFromSid(sid):
+    return Member.query.filter(Member.sid==sid).first().memberId
