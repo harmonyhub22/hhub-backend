@@ -1,10 +1,6 @@
 import os
-from app.app import app
+from app.app import app, sio
 
-awesomeapp = app
-
-from app.socket.init import sio
-import app.socket.endpoints # add all socket.io event listeners
-
-if __name__ == '__main__':
-    sio.run(app)
+if __name__ == "__main__":
+    print('in main')
+    sio.run(app)#, port=os.getenv('PORT', 5000))

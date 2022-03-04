@@ -1,3 +1,4 @@
+from distutils.log import debug
 import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
@@ -15,6 +16,7 @@ from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from app.services.MemberService import getById
 from app.socket.init import sio
+from flask_socketio import emit
 
 def create_app(config_file):
     """
@@ -35,7 +37,7 @@ def create_app(config_file):
     db.init_app(app)
 
     # sockets
-    sio.init_app(app, cors_allowed_origins=os.getenv('CORS_ORIGIN'), async_mode='threading')
+    sio.init_app(app, cors_allowed_origins=os.getenv('CORS_ORIGIN'), logger=True)
 
     with app.app_context():
 
@@ -53,7 +55,7 @@ def create_app(config_file):
         def favicon():
             return send_from_directory(app.root_path,
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-    
+
         @app.before_request
         def authenticate():
             if request.path == '/logout': # let them logout no matter what
@@ -101,7 +103,7 @@ def create_app(config_file):
         def logout():
             session.clear()
             return jsonify({ 'success': True })
-    
+
         @app.route('/')
         def home():
             return "<h1>Welcome to hhub backend</h1>"
@@ -123,9 +125,4 @@ def create_app(config_file):
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
-        @sio.on('connect')
-        def connect():
-            sid = request.sid      
-            print('sid', sid)
-
-        return app
+        return app, sio

@@ -4,7 +4,8 @@ from app.db.db import db
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.services.SessionService import createSession
-from app.socket.utils import addToRoom, emitMessageToRoom, getSids
+from app.socket.init import addToRoom, emitMessageToRoom
+from app.socket.utils import getSids
 
 def getById(id):
     return MatchingQueue.query.get(id)
