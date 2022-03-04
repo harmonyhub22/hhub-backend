@@ -94,7 +94,8 @@ def create_app(config_file):
                 return jsonify({ 'url': authUrl }), 302
             print('auth redirect')
             #verifyLogin()
-            getOrCreateMember()   
+            getOrCreateMember()
+            return redirect(os.getenv('CORS_ORIGIN'))
             return jsonify({ 'success': True })
         
         @app.route('/logout')
