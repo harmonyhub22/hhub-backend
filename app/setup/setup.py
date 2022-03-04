@@ -96,12 +96,13 @@ def create_app(config_file):
             #verifyLogin()
             getOrCreateMember()
             return redirect(os.getenv('CORS_ORIGIN'))
-            return jsonify({ 'success': True })
+            #return jsonify({ 'success': True })
         
         @app.route('/logout')
         def logout():
             session.clear()
-            return jsonify({ 'success': True })
+            return redirect(os.getenv('CORS_ORIGIN'))
+            #return jsonify({ 'success': True })
 
         @app.route('/')
         def home():
