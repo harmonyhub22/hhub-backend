@@ -12,6 +12,7 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
+from app.controller import oauth
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from app.services.MemberService import getById
@@ -56,6 +57,7 @@ def create_app(config_file):
             return send_from_directory(app.root_path,
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+        '''
         @app.before_request
         def authenticate():
             if request.path == '/logout': # let them logout no matter what
@@ -69,7 +71,8 @@ def create_app(config_file):
                 return redirect(authUrl)
                 #return jsonify({ 'url': authUrl }), 302
             if getById(memberid) == None: # the database doesn't have them so logout
-                return redirect('/logout')
+                return jsonify({ 'url': authUrl }), 302
+                #return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid
         
         ### CORS section
@@ -92,10 +95,9 @@ def create_app(config_file):
             if not request.args.get('state'):
                 authUrl = login()
                 return jsonify({ 'url': authUrl }), 302
-            print('auth redirect')
             verifyLogin()
             getOrCreateMember()
-            #return redirect(os.getenv('CORS_ORIGIN'))
+            # return redirect(os.getenv('CORS_ORIGIN'))
             return jsonify({ 'success': True })
         
         @app.route('/logout')
@@ -103,6 +105,7 @@ def create_app(config_file):
             session.clear()
             return redirect(os.getenv('CORS_ORIGIN'))
             #return jsonify({ 'success': True })
+        '''
 
         @app.route('/')
         def home():
@@ -124,5 +127,11 @@ def create_app(config_file):
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
+
+        app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
+        app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
+
+        # Request pre and post processors
+        app.before_request(oauth.enforce_login)
 
         return app, sio
