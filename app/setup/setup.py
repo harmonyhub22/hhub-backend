@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
+from app.api.LoginApi import LoginApi
+from app.api.LogoutApi import LogoutApi
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
 from app.db.seed.data import seed
@@ -12,9 +14,9 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
-from app.controller import oauth
 from app.exceptions.ErrorHandler import handle_error
-from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+#from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
+from app.middleware.NoAuth import getCookie
 from app.services.MemberService import getById
 from app.socket.init import sio
 from flask_socketio import emit
@@ -75,6 +77,17 @@ def create_app(config_file):
                 #return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid
         
+        @app.route('/google-login')
+        def authCallback():
+            if not request.args.get('state'):
+                authUrl = login()
+                return jsonify({ 'url': authUrl }), 302
+            verifyLogin()
+            getOrCreateMember()
+            # return redirect(os.getenv('CORS_ORIGIN'))
+            return jsonify({ 'success': True })
+        '''
+    
         ### CORS section
         @app.after_request
         def after_request_func(response):
@@ -89,24 +102,6 @@ def create_app(config_file):
             return response
         ### end CORS section
 
-        
-        @app.route('/google-login')
-        def authCallback():
-            if not request.args.get('state'):
-                authUrl = login()
-                return jsonify({ 'url': authUrl }), 302
-            verifyLogin()
-            getOrCreateMember()
-            # return redirect(os.getenv('CORS_ORIGIN'))
-            return jsonify({ 'success': True })
-        
-        @app.route('/logout')
-        def logout():
-            session.clear()
-            return redirect(os.getenv('CORS_ORIGIN'))
-            #return jsonify({ 'success': True })
-        '''
-
         @app.route('/')
         def home():
             return "<h1>Welcome to hhub backend</h1>"
@@ -119,6 +114,8 @@ def create_app(config_file):
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')
+        api.add_resource(LoginApi, '/api/login')
+        api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
         api.add_resource(SessionLiveApi, '/api/session/live')
@@ -128,10 +125,11 @@ def create_app(config_file):
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
-        app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
-        app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
+        #app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
+        #app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
 
         # Request pre and post processors
-        app.before_request(oauth.enforce_login)
+        #app.before_request(oauth.enforce_login)
+        app.before_request(getCookie)
 
         return app, sio

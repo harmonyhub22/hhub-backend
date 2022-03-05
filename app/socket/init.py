@@ -29,7 +29,6 @@ def connect():
     memberId = request.args['memberId']
     if memberId == None: # not member is logged in
         raise ConnectionRefusedError('unauthorized!')
-    oldSid = getSid(memberId)
     if getSid(memberId) != None and sid != getSid(memberId):
         disconnectMember(memberId)
     setSid(memberId, sid)
