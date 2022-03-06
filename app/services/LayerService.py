@@ -12,8 +12,25 @@ def getById(id):
 def getAllBySessionId(sessionId):
     return Layer.query.filter(Layer.sessionId==sessionId).all()
 
-def addOrEditLayer(sessionId, memberId, data, layerId=None):
+def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
+    session = getSessionById(sessionId)
+    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
+        raise BadRequestException('you cannot edit this layer')
+    layer = getById(layerId)
+    if layer == None:
+        raise BadRequestException('layer with this id does not exist')
 
+    if layer.bucketUrl != None:
+        deleteBucketFile(layer.bucketUrl)
+    
+    url = uploadBucketFile(file, filename, contentType)
+
+    layer.bucketUrl = url
+    db.session.commit()
+
+    return layer
+
+def addOrEditLayer(sessionId, memberId, data, layerId=None):
     session = getSessionById(sessionId)
     if session.member1Id != memberId and session.member2Id != memberId:
         raise BadRequestException('you are not part of this session') # they aren't part of the session
@@ -21,11 +38,10 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     startTime = data['startTime']
     endTime = data['endTime']
     repeatCount = data['repeatCount']
-    bucketUrl = data['bucketUrl']
     if layerId == None: # adding a new layer
         # TODO: Genereate bucket url
         try:
-            record = Layer(sessionId, startTime, endTime, repeatCount, bucketUrl)
+            record = Layer(sessionId, startTime, endTime, repeatCount, '')
             db.session.add(record)
             db.session.commit()
             return record
@@ -58,24 +74,6 @@ def deleteLayer(sessionId, memberId, layerId):
         return layer
     except Exception:
         db.session.rollback()
-
-def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
-    session = getSessionById(sessionId)
-    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
-        raise BadRequestException('you cannot edit this layer')
-    layer = getById(layerId)
-    if layer == None:
-        raise BadRequestException('layer with this id does not exist')
-
-    if layer.bucketUrl != None:
-        deleteBucketFile(layer.bucketUrl)
-    
-    url = uploadBucketFile(file, filename, contentType)
-
-    layer.bucketUrl = url
-    db.session.commit()
-
-    return layer
 
 def deleteFile(sessionId, layerId, memberId):
     session = getSessionById(sessionId)

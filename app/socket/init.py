@@ -38,7 +38,7 @@ def message(json):
     print('received json: ' + str(json))
     emit('message', 'sup')
 
-@sio.on('join-session')
+@sio.on('join_session')
 def joinRoom(json):
     print('received json: ' + str(json))
     sid = request.sid
@@ -50,6 +50,17 @@ def joinRoom(json):
     if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
         addToRoom(sid, str('session=' + sessionId))
         emitMessageToRoom('message', 'sup to room', str('session=' + sessionId))
+
+@sio.on('add_layer')
+def add_layer(json):
+    sessionId = json['sessionId']
+    #sio.emit('layer_being_added', 'Your partner has submitted a layer!', str('session=' + sessionId), skip_sid=sid)
+    emitMessageToRoom('layer_being_added', 'Your partner has submitted a layer!', str('session=' + sessionId))
+
+@sio.on('finished')
+def finishSong(json):
+    print('received json: ' + str(json))
+    
 
 @sio.on('disconnect')
 def disconnect():
