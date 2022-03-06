@@ -18,13 +18,14 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     if session.member1Id != memberId and session.member2Id != memberId:
         raise BadRequestException('you are not part of this session') # they aren't part of the session
 
-    startMeasure = data['startMeasure']
+    startTime = data['startTime']
+    endTime = data['endTime']
     repeatCount = data['repeatCount']
     bucketUrl = data['bucketUrl']
     if layerId == None: # adding a new layer
         # TODO: Genereate bucket url
         try:
-            record = Layer(sessionId, startMeasure, repeatCount, bucketUrl)
+            record = Layer(sessionId, startTime, endTime, repeatCount, bucketUrl)
             db.session.add(record)
             db.session.commit()
             return record
@@ -33,7 +34,8 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
             raise ServerErrorException('could not add layer')
     try: # editing existing layer
         existing_record = Layer.query.get(layerId)
-        existing_record.startMeasure = startMeasure
+        existing_record.startTime = startTime
+
         existing_record.repeatCount = repeatCount
         db.session.commit()
         return existing_record
