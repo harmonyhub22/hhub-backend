@@ -68,7 +68,7 @@ def seed():
     s.commit()
 
     # layers
-    layer1 = Layer(session1.sessionId, member1.memberId, 0, 1, 'something.com')
+    layer1 = Layer(session1.sessionId, member1.memberId, 0, 0, 1, 'something.com')
     layer1.layerId = '650c0a24-5aab-4c79-990a-61493cd146dc'
     s.add(layer1)
 
