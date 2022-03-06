@@ -1,10 +1,8 @@
 import uuid
 from flask import jsonify, request
 from flask_restful import Resource, reqparse
+from werkzeug.datastructures import FileStorage
 from app.services.LayerService import *
-
-# Define parser and request args
-parser = reqparse.RequestParser()
 
 class LayerApi(Resource):
 

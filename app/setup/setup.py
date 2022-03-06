@@ -17,9 +17,8 @@ from app.api.SongApi import SongApi
 from app.exceptions.ErrorHandler import handle_error
 #from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from app.middleware.NoAuth import getCookie
-from app.services.MemberService import getById
 from app.socket.init import sio
-from flask_socketio import emit
+from app.controller.layerUpload import layerUploadBlueprint
 
 def create_app(config_file):
     """
@@ -111,6 +110,8 @@ def create_app(config_file):
             return '<h4>Route not found: ' + str(request.path) + '<h4>'
 
         app.register_error_handler(Exception, handle_error)
+
+        app.register_blueprint(layerUploadBlueprint)
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')

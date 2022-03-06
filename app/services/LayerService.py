@@ -1,8 +1,8 @@
 import uuid
+from app.bucket.bucket import deleteBucketFile, uploadBucketFile
 from app.db.models.Layer import Layer
 from app.db.db import db
 from app.services.SessionService import getById as getSessionById
-from app.services.MemberService import getById as getMemberById
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 
@@ -56,4 +56,35 @@ def deleteLayer(sessionId, memberId, layerId):
         return layer
     except Exception:
         db.session.rollback()
-        
+
+def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
+    session = getSessionById(sessionId)
+    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
+        raise BadRequestException('you cannot edit this layer')
+    layer = getById(layerId)
+    if layer == None:
+        raise BadRequestException('layer with this id does not exist')
+
+    if layer.bucketUrl != None:
+        deleteBucketFile(layer.bucketUrl)
+    
+    url = uploadBucketFile(file, filename, contentType)
+
+    layer.bucketUrl = url
+    db.session.commit()
+
+    return layer
+
+def deleteFile(sessionId, layerId, memberId):
+    session = getSessionById(sessionId)
+    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
+        raise BadRequestException('you cannot edit this layer')
+    layer = getById(layerId)
+
+    if layer.bucketUrl == None:
+        return layer
+    
+    deleteBucketFile(layer.bucketUrl)
+    layer.bucketUrl = None
+    db.session.commit()
+    return layer
