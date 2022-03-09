@@ -1,5 +1,5 @@
 from flask import request, session
-from flask_socketio import SocketIO, leave_room, join_room
+from flask_socketio import SocketIO, leave_room, join_room, rooms
 from flask_socketio import emit
 from app.services.MemberService import getMemberIdFromSid, getSid, setSid, updateSid
 from app.services.SessionService import getById as getSessionById
@@ -12,8 +12,8 @@ def addToRoom(sid, roomName):
 def removeFromRoom(sid, roomName):
     leave_room(roomName, sid=sid)
 
-def emitMessageToRoom(event, data, roomName):
-    sio.emit(event, data, room=roomName)
+def emitMessageToRoom(event, data, roomName, includeSelf=True):
+    sio.emit(event, data, room=roomName, includeSelf=includeSelf)
 
 def destroyRoom(roomName):
     sio.close_room(room=roomName)
@@ -51,11 +51,14 @@ def joinRoom(json):
         addToRoom(sid, str('session-' + sessionId))
         emitMessageToRoom('message', 'sup to room', str('session=' + sessionId))
 
-@sio.on('add_layer')
+@sio.on('add_layers')
 def add_layer(json):
-    sessionId = json['sessionId']
-    #sio.emit('layer_being_added', 'Your partner has submitted a layer!', str('session=' + sessionId), skip_sid=sid)
-    emitMessageToRoom('layer_being_added', 'Your partner has submitted a layer!', str('session=' + sessionId))
+    sid = request.sid
+    layerIds = json['layerIds']
+    roomNames = rooms(sid=sid)
+    if len(roomNames) < 1: return
+    name = roomNames[0]
+    emitMessageToRoom('layer_added', { layerIds: layerIds }, name, includeSelf=False)
 
 @sio.on('finished')
 def finishSong(json):

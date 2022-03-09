@@ -15,6 +15,7 @@ class Layer(db.Model):
     startTime: int
     endTime: int
     repeatCount: int
+    file: str
     bucketUrl: str
     member: Member
 
@@ -24,16 +25,18 @@ class Layer(db.Model):
     startTime = db.Column('startTime', db.Integer, nullable=False, default=0)
     endTime = db.Column('endTime', db.Integer, nullable=False, default=0)
     repeatCount = db.Column('repeat_count', db.Integer, nullable=False, default=1)
+    file = db.Column('file', db.String(255), nullable=True)
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
     member = db.relationship('Member', uselist=False, lazy='subquery')
 
-    def __init__(self, sessionId, memberId, startTime, endTime, repeatCount, bucketUrl):
+    def __init__(self, sessionId, memberId, startTime, endTime, repeatCount, bucketUrl=None, file=None):
         self.sessionId = sessionId
         self.memberId = memberId
         self.startTime = startTime
         self.endTime = endTime
         self.repeatCount = repeatCount
         self.bucketUrl = bucketUrl
+        self.file = file
 
     def __repr__(self):
         return '<layer %s>' % str(self.layerId)

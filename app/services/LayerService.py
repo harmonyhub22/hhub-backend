@@ -38,10 +38,11 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     startTime = data['startTime']
     endTime = data['endTime']
     repeatCount = data['repeatCount']
+    file = data['file']
     if layerId == None: # adding a new layer
         # TODO: Genereate bucket url
         try:
-            record = Layer(sessionId, startTime, endTime, repeatCount, '')
+            record = Layer(sessionId, startTime, endTime, repeatCount, '', file)
             db.session.add(record)
             db.session.commit()
             return record
