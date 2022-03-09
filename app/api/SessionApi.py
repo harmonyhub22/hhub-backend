@@ -16,7 +16,8 @@ class SessionApi(Resource):
         memberSessions = getAllByMemberId(memberId)
         if id != None:
             for i in memberSessions:
-                if i.sessionId == id:
+                print(i.sessionId)
+                if i.sessionId == uuid.UUID(id):
                     return jsonify(i)
             raise BadRequestException('no session with this id')
         args = parser.parse_args()

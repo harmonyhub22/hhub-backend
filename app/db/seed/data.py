@@ -61,9 +61,9 @@ def seed():
     #s.add(MatchingQueue(member3.memberId)) # will joins the queue
 
     # sessions
-    # session1 = Session(genre1.genreId, member1.memberId, member4.memberId) # greg and dean join a session
-    # session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
-    # s.add(session1)
+    session1 = Session(genre1.genreId, member1.memberId, member4.memberId) # greg and dean join a session
+    session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
+    s.add(session1)
 
     s.commit()
 

@@ -48,7 +48,7 @@ def joinRoom(json):
         return
     musicSession = getSessionById(sessionId)
     if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
-        addToRoom(sid, str('session=' + sessionId))
+        addToRoom(sid, str('session-' + sessionId))
         emitMessageToRoom('message', 'sup to room', str('session=' + sessionId))
 
 @sio.on('add_layer')

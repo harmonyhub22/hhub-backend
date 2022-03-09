@@ -43,9 +43,9 @@ def joinOrAttemptMatch(memberId):
         session = match(memberId)
         sid1 = getSid(session.member1.memberId)
         sid2 = getSid(session.member2.memberId)
-        addToRoom(sid1, 'session='+str(session.sessionId))
-        addToRoom(sid2, 'session='+str(session.sessionId))
-        emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session='+str(session.sessionId))
+        addToRoom(sid1, 'session-'+str(session.sessionId))
+        addToRoom(sid2, 'session-'+str(session.sessionId))
+        emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
         return None
     
     # otherwise, get added to the queue
