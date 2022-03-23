@@ -12,31 +12,48 @@ class Layer(db.Model):
 
     layerId: uuid
     sessionId: uuid
-    startTime: int
-    endTime: int
-    repeatCount: int
-    file: str
+    name: str
+    startTime: float
+    duration: float
+    fileName: str
     bucketUrl: str
+    fadeInDuration: float
+    fadeOutDuration: float
+    reversed: bool
+    trimmedStartDuration: float
+    trimmedEndDuration: float
     member: Member
 
     layerId = db.Column('layer_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey('public.session.session_id'), nullable=False)
     memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
-    startTime = db.Column('startTime', db.Integer, nullable=False, default=0)
-    endTime = db.Column('endTime', db.Integer, nullable=False, default=0)
-    repeatCount = db.Column('repeat_count', db.Integer, nullable=False, default=1)
-    file = db.Column('file', db.String(255), nullable=True)
+    name = db.Column('name', db.String(50), nullable=False, default="layer-name")
+    startTime = db.Column('start_time', db.Float, nullable=False, default=0.0)
+    duration = db.Column('duration', db.Float, nullable=False, default=0.0)
+    fileName = db.Column('file_name', db.String(255), nullable=True)
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
+    fadeInDuration = db.Column('fade_in_duration', db.Float, nullable=False, default=0.0)
+    fadeOutDuration = db.Column('fade_out_duration', db.Float, nullable=False, default=0.0)
+    reversed = db.Column('reversed', db.Boolean, nullable=False, default=False)
+    trimmedStartDuration = db.Column('trimmed_start_duration', db.Float, nullable=False, default=0.0)
+    trimmedEndDuration = db.Column('trimmed_end_duration', db.Float, nullable=False, default=0.0)
     member = db.relationship('Member', uselist=False, lazy='subquery')
 
-    def __init__(self, sessionId, memberId, startTime, endTime, repeatCount, bucketUrl=None, file=None):
+    def __init__(self, sessionId, memberId, name, startTime, duration, fadeInDuration, fadeOutDuration, reversed, 
+        trimmedStartDuration, trimmedEndDuration, bucketUrl=None, fileName=None):
+
         self.sessionId = sessionId
         self.memberId = memberId
+        self.name = name
         self.startTime = startTime
-        self.endTime = endTime
-        self.repeatCount = repeatCount
+        self.duration = duration
+        self.fadeInDuration = fadeInDuration
+        self.fadeOutDuration = fadeOutDuration
+        self.reversed = reversed
+        self.trimmedStartDuration = trimmedStartDuration
+        self.trimmedEndDuration = trimmedEndDuration
         self.bucketUrl = bucketUrl
-        self.file = file
+        self.fileName = fileName
 
     def __repr__(self):
         return '<layer %s>' % str(self.layerId)
