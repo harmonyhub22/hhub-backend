@@ -20,13 +20,3 @@ def app():
 
     os.close(db_fd)
     os.unlink(db_path)
-
-# Tests will use this client to make requests to the application without running the server
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-# the runner fixture creates a runner that can call the Click commands registered with the application
-@pytest.fixture
-def runner(app):
-    return app.test_cli_runner()
