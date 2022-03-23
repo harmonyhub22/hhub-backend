@@ -20,7 +20,7 @@ from app.middleware.NoAuth import getCookie
 from app.socket.init import sio
 from app.controller.layerUpload import layerUploadBlueprint
 
-def create_app(config_file):
+def create_app(test_config=None):
     """
     Creating and returning the app
     """
@@ -33,7 +33,13 @@ def create_app(config_file):
 
     # rest api
     api = Api(app)
-    app.config.from_pyfile(config_file)
+
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        app.config.from_pyfile('settings.py', silent=True)
+    else:
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
 
     # database
     db.init_app(app)
