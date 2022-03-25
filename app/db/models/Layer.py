@@ -14,6 +14,7 @@ class Layer(db.Model):
     sessionId: uuid
     name: str
     startTime: float
+    y: float
     duration: float
     fileName: str
     bucketUrl: str
@@ -29,6 +30,7 @@ class Layer(db.Model):
     memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     name = db.Column('name', db.String(50), nullable=False, default="layer-name")
     startTime = db.Column('start_time', db.Float, nullable=False, default=0.0)
+    y = db.Column('y', db.Float, default=0.0)
     duration = db.Column('duration', db.Float, nullable=False, default=0.0)
     fileName = db.Column('file_name', db.String(255), nullable=True)
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
@@ -40,7 +42,7 @@ class Layer(db.Model):
     member = db.relationship('Member', uselist=False, lazy='subquery')
 
     def __init__(self, sessionId, memberId, name, startTime, duration, fadeInDuration, fadeOutDuration, reversed, 
-        trimmedStartDuration, trimmedEndDuration, bucketUrl=None, fileName=None):
+        trimmedStartDuration, trimmedEndDuration, bucketUrl=None, fileName=None, y=None):
 
         self.sessionId = sessionId
         self.memberId = memberId
@@ -54,6 +56,7 @@ class Layer(db.Model):
         self.trimmedEndDuration = trimmedEndDuration
         self.bucketUrl = bucketUrl
         self.fileName = fileName
+        self.y = y
 
     def __repr__(self):
         return '<layer %s>' % str(self.layerId)
