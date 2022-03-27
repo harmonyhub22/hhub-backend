@@ -68,12 +68,12 @@ def seed():
     s.commit()
 
     # layers
-    layer1 = Layer(session1.sessionId, member1.memberId, name='layer1', startTime=0.5, duration=5.2, fadeInDuration=0.1, 
-        fadeOutDuration=1.5, reversed=False, trimmedStartDuration=0.5, trimmedEndDuration=1.0, bucketUrl=None, fileName="Drum3", y=0.0)
-    layer1.layerId = '650c0a24-5aab-4c79-990a-61493cd146dc'
-    s.add(layer1)
+    #layer1 = Layer(session1.sessionId, member1.memberId, name='layer1', startTime=0.5, duration=5.2, fadeInDuration=0.1, 
+    #    fadeOutDuration=1.5, reversed=False, trimmedStartDuration=0.5, trimmedEndDuration=1.0, bucketUrl=None, fileName="Drum3", y=0.0)
+    #layer1.layerId = '650c0a24-5aab-4c79-990a-61493cd146dc'
+    #s.add(layer1)
 
-    s.commit()
+    #s.commit()
 
     # songs
     song1 = Song(session1.sessionId, 'Some song', 60, 'something.com', 120)
