@@ -37,6 +37,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
 
     name = data['name']
     startTime = data['startTime']
+    print(startTime)
     duration = data['duration']
     fadeInDuration = data['fadeInDuration']
     fadeOutDuration = data['fadeOutDuration']
