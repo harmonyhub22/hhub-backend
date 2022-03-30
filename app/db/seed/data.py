@@ -39,9 +39,9 @@ def seed():
     member3auth = Auth(member3.memberId, hashedPwd)
     member4auth = Auth(member4.memberId, hashedPwd)
     s.add(member1auth)
-    s.add(member1auth)
-    s.add(member1auth)
-    s.add(member1auth)
+    s.add(member2auth)
+    s.add(member3auth)
+    s.add(member4auth)
     s.commit()
 
     # add friend requests
