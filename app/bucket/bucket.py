@@ -17,7 +17,6 @@ def getBotoClient():
 
 def uploadBucketFile(file, filename, contentType):
     client = getBotoClient()
-    print('got client')
     filename = generateFileName(filename)
 
     client.put_object(Body=file,

@@ -28,21 +28,17 @@ def createSession(member1Id, member2Id, genreId):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     if not member2 or not member1:
-        print('member does not exist')
         raise BadRequestException('member does not exist')
     if member2Id == member1Id:
-        print('cannot start a session with yourself')
         raise BadRequestException('cannot start session with yourself')
 
     genre = getGenreById(genreId)
     if not genre:
-        print('genreId does not exist')
         raise BadRequestException('genreId does not exist')
 
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
-        print('Someone is already in a session')
         raise BadRequestException('you or other member is already in a Session')
 
     try:
@@ -55,8 +51,6 @@ def createSession(member1Id, member2Id, genreId):
         raise ServerErrorException('cannot create Session')
 
 def endSession(memberId, sessionId):
-    # TODO: must save layers into one audio file
-    # then delete all layer records
     session = Session.query.get(sessionId)
     memberId = uuid.UUID(memberId)
     if session == None or (session.member1Id != memberId and session.member2Id != memberId):

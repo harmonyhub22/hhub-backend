@@ -68,7 +68,6 @@ def finishSong(json):
 @sio.on('disconnect')
 def disconnect():
     disconnectMember(request.sid)
-    print('goodbye')
 
 @sio.on_error()  # Handles the default namespace
 def error_handler(e):

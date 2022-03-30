@@ -31,7 +31,6 @@ flow = Flow.from_client_config(client_config=client_config,
 
 def getSession():
     try:
-        print(session)
         return session['memberid']
     except Exception:
         return None
@@ -42,7 +41,6 @@ def login():
     return authorization_url
 
 def verifyLogin():
-    print(request.args.get('state'), session.get('state'))
     if session['state'] != request.args.get('state'):
         raise UnauthorizedException('Google Login Failed')
     
@@ -64,10 +62,8 @@ def getOrCreateMember():
     lastname = id_info.get("family_name")
     
     member = getByEmail(email)
-    print("Current member ", member)
    
     if not member:
-        print("You are not in our system")
         member = addMember(email, firstname, lastname)
     
     session['memberid'] = member.memberId

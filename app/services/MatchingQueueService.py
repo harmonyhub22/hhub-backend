@@ -37,9 +37,7 @@ def joinOrAttemptMatch(memberId):
     existing_record = getByMemberId(memberId)
     
     # if theres 1 person currently in the queue, match with them
-    print("DEBUG:", str(len(getTop2())))
     if len(getTop2()) == 1:
-        print('only 1 in queue, proceeding to match')
         session = match(memberId)
         sid1 = getSid(session.member1.memberId)
         sid2 = getSid(session.member2.memberId)
@@ -50,7 +48,6 @@ def joinOrAttemptMatch(memberId):
     
     # otherwise, get added to the queue
     else:
-        print('adding to queue')
         if existing_record != None:
             return existing_record
         try:

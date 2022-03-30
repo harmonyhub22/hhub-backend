@@ -5,7 +5,6 @@ from app.exceptions.UnauthorizedException import UnauthorizedException
 
 def getCookie():
     memberId = request.cookies.get('memberId')
-    print(request.path)
     if request.path == '/api/login':
         if memberId != None:
             request.environ['HTTP_MEMBERID'] = memberId

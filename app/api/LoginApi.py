@@ -9,14 +9,11 @@ class LoginApi(Resource):
         memberId = None
         try:
             memberId = request.headers['MEMBERID']
-            print('memberId', memberId)
             return jsonify(getById(memberId))
         except:
-            print('logging in')
             member = getByEmail(data['email'])
             if member == None:
                 member = addMember(memberId, data['email'], data['firstname'], data['lastname'])
-            print('memberId', member.memberId)
             resp = make_response(jsonify(member), 200)
             resp.set_cookie('memberId', value=str(member.memberId))
             return resp

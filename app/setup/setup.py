@@ -81,16 +81,6 @@ def create_app(test_config=None):
                 return jsonify({ 'url': authUrl }), 302
                 #return redirect('/logout')
             request.environ['HTTP_MEMBERID'] = memberid
-        
-        @app.route('/google-login')
-        def authCallback():
-            if not request.args.get('state'):
-                authUrl = login()
-                return jsonify({ 'url': authUrl }), 302
-            verifyLogin()
-            getOrCreateMember()
-            # return redirect(os.getenv('CORS_ORIGIN'))
-            return jsonify({ 'success': True })
         '''
     
         ### CORS section
@@ -132,11 +122,7 @@ def create_app(test_config=None):
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
-        #app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
-        #app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
-
         # Request pre and post processors
-        #app.before_request(oauth.enforce_login)
         app.before_request(getCookie)
 
         return app, sio

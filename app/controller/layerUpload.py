@@ -16,7 +16,6 @@ def layerPost(sessionId, layerId):
     file = request.files['file']
     if not file:
         raise BadRequestException('file not provided')
-    print(file.filename)
 
     filename = secure_filename(file.filename)
     contentType = request.mimetype

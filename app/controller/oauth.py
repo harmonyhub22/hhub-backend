@@ -67,10 +67,8 @@ def callback():
     lastname = id_info.get("family_name")
     
     member = getByEmail(email)
-    print("Current member ", member)
    
     if not member:
-        print("You are not in our system")
         member = addMember(email, firstname, lastname)
     
     flask.session['memberid'] = member.memberId
