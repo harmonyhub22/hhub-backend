@@ -1,6 +1,5 @@
 from distutils.log import debug
 import os
-from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
 from app.api.LoginApi import LoginApi
@@ -14,9 +13,10 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
+from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 #from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
-from app.middleware.NoAuth import getCookie
+from app.middleware.NoAuth import getCookie, token_required
 from app.socket.init import sio
 from app.controller.layerUpload import layerUploadBlueprint
 
@@ -27,7 +27,7 @@ def create_app(config_file):
 
     app_path = os.path.dirname(os.path.abspath(__file__))
     project_folder = os.path.expanduser(app_path)
-    load_dotenv(os.path.join(project_folder, '.env'))
+    #load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
 
@@ -125,12 +125,13 @@ def create_app(config_file):
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
+        api.add_resource(AuthenticationApi, '/api/authen', '/api/users', '/api/userlogin')
 
         #app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
         #app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
 
         # Request pre and post processors
         #app.before_request(oauth.enforce_login)
-        app.before_request(getCookie)
+        #app.before_request(getCookie)
 
         return app, sio
