@@ -1,6 +1,5 @@
 import os
-from app.app import getApps
+from app.app import app, sio
 
 if __name__ == "__main__":
-    app, sio = getApps()
     sio.run(app)

@@ -8,7 +8,7 @@ from os.path import dirname as d
 from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))
 sys.path.append(root_dir)
-from app.app import getApps
+from app.setup.setup import create_app
 
 class AuthActions(object):
     def __init__(self, client):
@@ -30,14 +30,14 @@ def app():
     db_fd, db_path = tempfile.mkstemp()
 
     # we can also configure temporary database files or set configurations for testing
-    app, sio = getApps({
+    app, sio = create_app({
         'TESTING': True,
         'DATABASE': db_path,
+        'SQLALCHEMY_DATABASE_URI': os.environ.get('DATABASE_URL') if os.environ.get('DATABASE_URL').startswith("postgresql://") else os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1),
+        'SQLALCHEMY_TRACK_MODIFICATIONS': os.environ.get('SQLALCHEMY_TRACK_MODIFICATIONS', False),
+        'SESSION_COOKIE_HTTPONLY': True,
+        'REMEMBER_COOKIE_HTTPONLY': True,
     })
-    # app = create_app({
-    #     'TESTING': True,
-    #     'DATABASE': db_path,
-    # })
 
     yield app
 
