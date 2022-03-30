@@ -15,7 +15,6 @@ from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
 from app.exceptions.ErrorHandler import handle_error
-#from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
 from app.middleware.NoAuth import getCookie
 from app.socket.init import sio
 from app.controller.layerUpload import layerUploadBlueprint
@@ -63,25 +62,6 @@ def create_app(test_config=None):
         def favicon():
             return send_from_directory(app.root_path,
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
-        '''
-        @app.before_request
-        def authenticate():
-            if request.path == '/logout': # let them logout no matter what
-                return
-            memberid = getSession()
-            if not memberid and request.path == '/google-login': # don't check for session when google redirects
-                return
-            if not memberid: # check for session
-                print('you must login')
-                authUrl = login()
-                return redirect(authUrl)
-                #return jsonify({ 'url': authUrl }), 302
-            if getById(memberid) == None: # the database doesn't have them so logout
-                return jsonify({ 'url': authUrl }), 302
-                #return redirect('/logout')
-            request.environ['HTTP_MEMBERID'] = memberid
-        '''
     
         ### CORS section
         @app.after_request
