@@ -115,7 +115,7 @@ def create_app(config_file):
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')
-        api.add_resource(LoginApi, '/api/login')
+        api.add_resource(AuthenticationApi, '/api/login')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
@@ -125,13 +125,8 @@ def create_app(config_file):
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
-        api.add_resource(AuthenticationApi, '/api/authen', '/api/users', '/api/userlogin')
-
-        #app.add_url_rule('/oauth', endpoint='oauth.index', view_func=oauth.index)
-        #app.add_url_rule('/oauth/callback', endpoint='oauth.callback', view_func=oauth.callback)
 
         # Request pre and post processors
-        #app.before_request(oauth.enforce_login)
-        #app.before_request(getCookie)
+        app.before_request(getCookie)
 
         return app, sio

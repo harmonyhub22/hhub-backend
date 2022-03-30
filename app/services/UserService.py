@@ -1,4 +1,4 @@
-from app.db.models.User import User
+from app.db.models.Auth import User
 from sqlalchemy import func
 from app.db.db import db
 from app.exceptions.ServerErrorException import ServerErrorException

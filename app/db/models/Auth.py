@@ -7,20 +7,20 @@ from app.db.db import db
 from  werkzeug.security import generate_password_hash, check_password_hash
 
 @dataclass
-class User(db.Model):
+class Auth(db.Model):
     
-    userID: uuid
-    userName: str
+    authId: uuid
+    memberId: uuid
     password: str
     
     __table_args__ = {'schema':os.getenv('SCHEMA', 'public')} 
     
-    userID = db.Column('user_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    userName = db.Column('user_name', db.String(64), unique=True)
-    password = db.Column('password',db.String(128))
+    authId = db.Column('auth_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    memberId = db.Column('member_id', UUID(as_uuid=True), unique=True, default=uuid.uuid4)
+    password = db.Column('password', db.String(128))
     
-    def __init__(self, userName, password):
-        self.userName = userName
+    def __init__(self, memberId, password):
+        self.memberId = memberId
         self.password = password
     
     

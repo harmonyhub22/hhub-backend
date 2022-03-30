@@ -2,71 +2,81 @@ import os
 from flask import jsonify, make_response, request, session
 from flask_restful import Resource
 from app.middleware.NoAuth import token_required
-from app.services.UserService import *
+from app.services.AuthService import *
+from app.services.MemberService import *
 from  werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-import jwt
 import uuid
 
 class AuthenticationApi(Resource):
-    @token_required
-    def get(self):
-        users = getAll()
-        output = []
-        for user in users:
-            output.append({
-                'userName' : user.userName,
-                'password' : user.password
-            })
-        return jsonify({'users': output})
-    
+    # log in
     def put(self):
-        auth = request.form
+        data = request.get_json(force=True)
+        authResp = {
+            'reason': ''
+        }
 
-        if not auth or not auth.get('userName') or not auth.get('password'):
-            # returns 401 if any password is missing
-            return make_response(
-                'Could not verify',
-                401,
-                {'WWW-Authenticate' : 'Basic realm ="Login required !!"'}
-            )
-        user = getUserName(auth.get('userName'))
-        if not user:
-            # returns 401 if user does not exist
-            return make_response(
-                'Could not verify',
-                401,
-                {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'}
-            )
-        if check_password_hash(user.password, auth.get('password')):
+        if not data or not data.get('email') or not data.get('password'):
+            authResp['reason'] = "Please provide both an email and password!"
+            return make_response(jsonify(authResp), 401)
+            
+        member = getByEmail(data['email'])
+
+        if not member:
+            authResp['reason'] = "Account does not exist. Please create an account first!"
+            return make_response(jsonify(authResp), 403)
+        
+        password = data['password']
+        if check_password_hash(data.password, password):
             # generates the JWT Token
-            print("IDDDD", user.userID)
-            token = jwt.encode({
-                'userID': str(user.userID),
-                'exp' : datetime.utcnow() + timedelta(minutes = 30)
-            }, os.environ.get("SECRET_KEY", None))
-            print("The token is", token)
-            return make_response(jsonify({'token' : token}), 201)
-        
-        # returns 403 if password is wrong
-        return make_response(
-            'Could not verify',
-            403,
-            {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'}
-        )
-        
-    def post(self):
-        # creates a dictionary of the form data
-        data = request.form
+            hashedPassword = generate_password_hash(password)
+            addOrUpdateAuth(member.memberId, hashedPassword)
 
-        userName = data.get('userName')
-        password = generate_password_hash(data.get('password'))
+            try:
+                token = generateToken(member.memberId)
+            except:
+                authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
+                return make_response(jsonify(authResp), 401)
+
+            secret = os.environ.get("SECRET_KEY", None)
+            if secret == None:
+                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
+                return make_response(jsonify(authResp), 401)                
+            
+            token = jwt.encode({
+                'memberId': str(member.memberId),
+                'exp' : datetime.utcnow() + timedelta(hours=24)
+            }, secret)
+
+            authResp = make_response(jsonify({'succcess' : True}))
+            authResp.set_cookie('hhub-token', value=str(token))
+            return authResp
         
-        # checking for existing user
-        user = getUserName(userName)
-        if not user:
-            user = addUser(userName, password)
-            return make_response('Successfully registered.', 201)
+        authResp['reason'] = "Incorrect password!"
+        return make_response(jsonify(authResp), 403)
+    
+    # create an account
+    def post(self):
+        data = request.get_json(force=True)
+        authResp = {
+            'reason': ''
+        }
+
+        email = data['email']
+        member = getByEmail(email)
+
+        password = generate_password_hash(member.memberId)
+
+        if not member:
+            addOrUpdateAuth(member.memberId, password)
+            try:
+                token = generateToken(member.memberId)
+            except:
+                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
+                return make_response(jsonify(authResp), 401)
+            
+            authResp = make_response(jsonify({'succcess' : True}))
+            authResp.set_cookie('hhub-token', value=str(token))
+            return authResp
         else:
-            # returns 202 if user already exists
-            return make_response('User already exists. Please Log in.', 202)
+            return make_response('A user with this email already exists!', 202)
