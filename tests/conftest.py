@@ -1,7 +1,14 @@
 import os
 import tempfile
 import pytest
-from app.setup.setup import create_app
+
+# we must add the root dir to the python path in order for pytest to see app/app.py
+import sys
+from os.path import dirname as d
+from os.path import abspath, join
+root_dir = d(d(abspath(__file__)))
+sys.path.append(root_dir)
+from app.app import getApps
 
 class AuthActions(object):
     def __init__(self, client):
@@ -23,10 +30,14 @@ def app():
     db_fd, db_path = tempfile.mkstemp()
 
     # we can also configure temporary database files or set configurations for testing
-    app = create_app({
+    app, sio = getApps({
         'TESTING': True,
         'DATABASE': db_path,
     })
+    # app = create_app({
+    #     'TESTING': True,
+    #     'DATABASE': db_path,
+    # })
 
     yield app
 
