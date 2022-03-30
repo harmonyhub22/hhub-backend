@@ -16,7 +16,7 @@ class Auth(db.Model):
     __table_args__ = {'schema':os.getenv('SCHEMA', 'public')} 
     
     authId = db.Column('auth_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    memberId = db.Column('member_id', UUID(as_uuid=True), unique=True, default=uuid.uuid4)
+    memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey('public.member.member_id'), default=uuid.uuid4)
     password = db.Column('password', db.String(128))
     
     def __init__(self, memberId, password):
