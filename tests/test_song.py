@@ -8,8 +8,7 @@ CRUD operation: DELETE
 Service method tested: getById()
 Cases to test:
 1. getting a song which is not yet created, in which case queryset is empty
-2. for a song which is created, queryset should have 1 song
-3. check metadata of the song
+2. for a song which is created, queryset should have 1 song. check metadata
 '''
 def testGetSongById(app, client, auth):
     pass
@@ -21,8 +20,7 @@ Service method tested: getByName()
 Cases to test:
 1. getting a song which is not yet created, in which case queryset is empty
 2. trying to get a song with an invalid name (name != 'My New Song')
-3. for a song which is created, queryset should have 1 song, if the name is correct
-4. check metadata of the song
+3. for a song which is created, queryset should have 1 song, if the name is correct. check matadata
 '''
 def testGetSongByName(app, client, auth):
     pass

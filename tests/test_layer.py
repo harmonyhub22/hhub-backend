@@ -8,8 +8,7 @@ CRUD operation: GET
 Service method tested: getById()
 Cases to test:
 1. if the layer does not exist, the queryset should be empty
-2. if the layer does exist, the query should return 1 result (a layer with a matching ID)
-3. the returned layer should have metadata which matches the metadata used when creating it
+2. if the layer does exist, the query should return 1 result (a layer with a matching ID). check metadata
 '''
 def testGetLayerById(app, client, auth):
     pass
@@ -20,10 +19,8 @@ CRUD operation: GET
 Service method tested: getAllBySessionId()
 Cases to test:
 1. if the there are no layers in the session, the request should return an empty queryset
-2. if a user commits 1 layer, the queryset should now have 1 layer
-3. the 1st layer should have matching metadata
-4. if the partner commits another layer, the queryset should now have 2 layers
-5. the 2nd layer should have matching metadata
+2. if a user commits 1 layer, the queryset should now have 1 layer. check metadata
+3. if the partner commits another layer, the queryset should now have 2 layers. check metadata of 2nd layer
 '''
 def testGetLayers(app, client, auth):
     auth.login()
