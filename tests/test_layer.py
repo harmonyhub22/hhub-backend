@@ -50,22 +50,27 @@ def testGetLayers(app, client, auth):
     assert len(list(response)) == 1
 
 '''
-route: api/sessions/<session id>/layers/<layer id>
-REST operation: GET
-service method tested: getById
+route: api/sessions/<sessionID>/layers
+REST operation: POST
+service method tested: addOrEditLayer()
 '''
 def testAddLayer(client, auth):
-    auth.login()
-
-
     pass
 
 '''
-route: api/sessions/<session id>/layers/<layer id>
-REST operation: GET
+route: api/sessions/<sessionID>/layers/<layerID>
+REST operation: POST
 service method tested: addOrEditLayer()
 '''
 def testEditLayer(client, auth):
+    pass
+
+'''
+route: api/sessions/<sessionID>/layers/<layerID>/upload
+REST operation: PUT
+service method tested: uploadFile()
+'''
+def testUploadLayer(client, auth):
     pass
 
 '''

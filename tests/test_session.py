@@ -5,7 +5,12 @@ from app.db.models.Session import Session
 '''
 route: api/session/<sessionID>/layers/<layerID>
 REST operation: GET
-service method tested: getById()
+service method tested: getAllByMemberId()
+
+cases to test:
+- when the member ID is 
 '''
 def testGetSession(app, client, auth):
     pass
+
+
