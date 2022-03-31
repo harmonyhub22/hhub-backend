@@ -13,14 +13,14 @@ def layerPost(sessionId, layerId):
     memberId = request.headers['MEMBERID']
     memberId = uuid.UUID(memberId)
 
-    file = request.files['file']
-    if not file:
+    layerFile = request.files['file']
+    if not layerFile:
         raise BadRequestException('file not provided')
 
-    filename = secure_filename(file.filename)
+    filename = secure_filename(layerFile.filename)
     contentType = request.mimetype
 
-    return jsonify(uploadFile(sessionId, layerId, memberId, file, filename, contentType))
+    return jsonify(uploadFile(sessionId, layerId, memberId, layerFile, filename, contentType))
 
 @layerUploadBlueprint.route('/delete', methods=['DELETE'])
 def layerDelete(sessionId, layerId):
