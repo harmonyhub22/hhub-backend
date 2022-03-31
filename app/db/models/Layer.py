@@ -20,7 +20,7 @@ class Layer(db.Model):
     bucketUrl: str
     fadeInDuration: float
     fadeOutDuration: float
-    reversed: bool
+    isReversed: bool
     trimmedStartDuration: float
     trimmedEndDuration: float
     member: Member
@@ -36,12 +36,12 @@ class Layer(db.Model):
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
     fadeInDuration = db.Column('fade_in_duration', db.Float, nullable=False, default=0.0)
     fadeOutDuration = db.Column('fade_out_duration', db.Float, nullable=False, default=0.0)
-    reversed = db.Column('reversed', db.Boolean, nullable=False, default=False)
+    isReversed = db.Column('reversed', db.Boolean, nullable=False, default=False)
     trimmedStartDuration = db.Column('trimmed_start_duration', db.Float, nullable=False, default=0.0)
     trimmedEndDuration = db.Column('trimmed_end_duration', db.Float, nullable=False, default=0.0)
     member = db.relationship('Member', uselist=False, lazy='subquery')
 
-    def __init__(self, sessionId, memberId, name, startTime, duration, fadeInDuration, fadeOutDuration, reversed, 
+    def __init__(self, sessionId, memberId, name, startTime, duration, fadeInDuration, fadeOutDuration, isReversed, 
         trimmedStartDuration, trimmedEndDuration, bucketUrl=None, fileName=None, y=None):
 
         self.sessionId = sessionId
@@ -51,7 +51,7 @@ class Layer(db.Model):
         self.duration = duration
         self.fadeInDuration = fadeInDuration
         self.fadeOutDuration = fadeOutDuration
-        self.reversed = reversed
+        self.isReversed = isReversed
         self.trimmedStartDuration = trimmedStartDuration
         self.trimmedEndDuration = trimmedEndDuration
         self.bucketUrl = bucketUrl

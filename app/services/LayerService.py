@@ -37,11 +37,10 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
 
     name = data['name']
     startTime = data['startTime']
-    print(startTime)
     duration = data['duration']
     fadeInDuration = data['fadeInDuration']
     fadeOutDuration = data['fadeOutDuration']
-    reversed = data['reversed']
+    isReversed = data['reversed']
     trimmedStartDuration = data['trimmedStartDuration']
     trimmedEndDuration = data['trimmedEndDuration']
     fileName = data['fileName']
@@ -49,7 +48,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     if layerId == None: # adding a new layer
         try:
             record = Layer(sessionId, memberId, name, startTime, duration, fadeInDuration,
-                fadeOutDuration, reversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
+                fadeOutDuration, isReversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
             db.session.add(record)
             db.session.commit()
             return record
@@ -63,7 +62,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
         existing_record.duration = duration
         existing_record.fadeInDuration = fadeInDuration
         existing_record.fadeOutDuration = fadeOutDuration
-        existing_record.reversed = reversed
+        existing_record.isReversed = isReversed
         existing_record.trimmedStartDuration = trimmedStartDuration
         existing_record.trimmedEndDuration = trimmedEndDuration
         existing_record.fileName = fileName
