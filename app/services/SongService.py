@@ -16,13 +16,6 @@ def getBySessionId(sessionId):
 def getAll():
     return Song.query.all()
 
-def createSong(sessionId, memberId):
-    # TODO
-    # somehow loop through all layers merging them
-    # upload to bucket
-    # return song record
-    pass
-
 def deleteSong(songId, memberId):
     song = Song.query.get(songId)
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:

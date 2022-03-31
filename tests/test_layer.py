@@ -3,17 +3,27 @@ from app.db.db import db
 from app.db.models.Layer import Layer
 
 '''
-route: api/session/<sessionID>/layers/<layerID>
-REST operation: GET
-service method tested: getById()
+Route: api/session/<sessionID>/layers/<layerID>
+CRUD operation: GET
+Service method tested: getById()
+Cases to test:
+1. if the layer does not exist, the queryset should be empty
+2. if the layer does exist, the query should return 1 result (a layer with a matching ID)
+3. the returned layer should have metadata which matches the metadata used when creating it
 '''
-def testGetLayerById():
+def testGetLayerById(app, client, auth):
     pass
 
 '''
-route: api/session/<sessionID>/layers
-REST operation: GET
-service method tested: getAllBySessionId()
+Route: api/session/<sessionID>/layers
+CRUD operation: GET
+Service method tested: getAllBySessionId()
+Cases to test:
+1. if the there are no layers in the session, the request should return an empty queryset
+2. if a user commits 1 layer, the queryset should now have 1 layer
+3. the 1st layer should have matching metadata
+4. if the partner commits another layer, the queryset should now have 2 layers
+5. the 2nd layer should have matching metadata
 '''
 def testGetLayers(app, client, auth):
     auth.login()
@@ -35,7 +45,7 @@ def testGetLayers(app, client, auth):
             duration=5.2,
             fadeInDuration=0.1, 
             fadeOutDuration=1.5,
-            reversed=False,
+            isReversed=False,
             trimmedStartDuration=0.5,
             trimmedEndDuration=1.0,
             bucketUrl=None,
@@ -50,33 +60,51 @@ def testGetLayers(app, client, auth):
     assert len(list(response)) == 1
 
 '''
-route: api/sessions/<sessionID>/layers
-REST operation: POST
-service method tested: addOrEditLayer()
+Route: api/sessions/<sessionID>/layers
+CRUD operation: POST
+Service method tested: addOrEditLayer()
+Cases to test:
+1. valid layer is added (check if number of layers increased by one and check metadata)
+2. invalid session ID (error is thrown)
+3. other ways adding a layer can fail?
 '''
-def testAddLayer(client, auth):
+def testAddLayer(app, client, auth):
     pass
 
 '''
-route: api/sessions/<sessionID>/layers/<layerID>
-REST operation: POST
-service method tested: addOrEditLayer()
+Route: api/sessions/<sessionID>/layers/<layerID>
+CRUD operation: POST
+Service method tested: addOrEditLayer()
+Cases to test:
+1. edit a 
 '''
-def testEditLayer(client, auth):
+def testEditLayer(app, client, auth):
     pass
 
 '''
-route: api/sessions/<sessionID>/layers/<layerID>/upload
-REST operation: PUT
-service method tested: uploadFile()
+Route: api/sessions/<sessionID>/layers/<layerID>/upload
+CRUD operation: PUT
+Service method tested: uploadFile()
 '''
-def testUploadLayer(client, auth):
+def testUploadLayer(app, client, auth):
     pass
 
 '''
-route: api/session/<sessionID>/layers/<layerID>
-REST operation: DELETE
-service method tested: deleteLayer()
+Route: api/session/<sessionID>/layers/<layerID>
+CRUD operation: DELETE
+Service method tested: deleteLayer()
+Cases to test:
+
 '''
-def testDeleteLayer(client, auth):
+def testDeleteLayer(app, client, auth):
+    pass
+
+'''
+Route: api/session/<sessionID>/layers/<layerID>/delete
+CRUD operation: DELETE
+Service method tested: deleteFile()
+Cases to test:
+
+'''
+def testDeleteLayerFile(app, client, auth):
     pass
