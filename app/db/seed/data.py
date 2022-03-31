@@ -18,7 +18,7 @@ def seed():
         return
     print('inserting seed data')
 
-    member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri', 'password')
+    member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri')
     member2 = Member('vitruong00@tamu.edu', 'Vi', 'Truong')
     member3 = Member('will@tamu.edu', 'Will', 'Thomas')
     member4 = Member('dean27@tamu.edu', 'Dean', 'Something')
@@ -33,16 +33,16 @@ def seed():
     s.add(member4)
     s.commit()
 
-    hashedPwd = generate_password_hash('password')
-    member1auth = Auth(member1.memberId, hashedPwd)
-    member2auth = Auth(member2.memberId, hashedPwd)
-    member3auth = Auth(member3.memberId, hashedPwd)
-    member4auth = Auth(member4.memberId, hashedPwd)
-    s.add(member1auth)
-    s.add(member1auth)
-    s.add(member1auth)
-    s.add(member1auth)
-    s.commit()
+    # hashedPwd = generate_password_hash('password')
+    # member1auth = Auth(member1.memberId, hashedPwd)
+    # member2auth = Auth(member2.memberId, hashedPwd)
+    # member3auth = Auth(member3.memberId, hashedPwd)
+    # member4auth = Auth(member4.memberId, hashedPwd)
+    # s.add(member1auth)
+    # s.add(member1auth)
+    # s.add(member1auth)
+    # s.add(member1auth)
+    # s.commit()
 
     # add friend requests
     s.add(MemberFriendRequest(member2.memberId, member1.memberId)) # vi requests greg

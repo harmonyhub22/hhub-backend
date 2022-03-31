@@ -16,7 +16,7 @@ from app.api.SongApi import SongApi
 from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 #from app.middleware.GoogleAuth import getOrCreateMember, getSession, login, verifyLogin
-from app.middleware.NoAuth import getCookie, token_required
+from app.middleware.NoAuth import getCookie
 from app.socket.init import sio
 from app.controller.layerUpload import layerUploadBlueprint
 
@@ -115,7 +115,7 @@ def create_app(config_file):
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')
-        api.add_resource(AuthenticationApi, '/api/login')
+        api.add_resource(AuthenticationApi, '/api/login', '/api/signup')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
@@ -127,6 +127,6 @@ def create_app(config_file):
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
         # Request pre and post processors
-        app.before_request(getCookie)
+        #app.before_request(getCookie)
 
         return app, sio

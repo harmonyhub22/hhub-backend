@@ -3,7 +3,6 @@ import os
 from flask import jsonify, make_response, request
 from app.exceptions.UnauthorizedException import UnauthorizedException
 import jwt
-from app.services.UserService import *
 
 def getCookie():
     token = request.cookies.get('hhub-token')
@@ -18,7 +17,6 @@ def getCookie():
 
     if request.path != '/api/login' and request.path != '/api/signup':
         data = jwt.decode(token, secret)
-        print("The data is", data)
         memberId = data['memberId']
         if memberId == None or len(memberId) < 36:
             raise UnauthorizedException('no memberId cookie found')

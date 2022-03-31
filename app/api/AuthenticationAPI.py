@@ -1,12 +1,10 @@
 import os
 from flask import jsonify, make_response, request, session
 from flask_restful import Resource
-from app.middleware.NoAuth import token_required
 from app.services.AuthService import *
 from app.services.MemberService import *
 from  werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-import uuid
 
 class AuthenticationApi(Resource):
     # log in
@@ -21,32 +19,19 @@ class AuthenticationApi(Resource):
             return make_response(jsonify(authResp), 401)
             
         member = getByEmail(data['email'])
+        authMember = getByMemberId(member.memberId)
 
-        if not member:
+        if not member or not authMember:
             authResp['reason'] = "Account does not exist. Please create an account first!"
             return make_response(jsonify(authResp), 403)
-        
-        password = data['password']
-        if check_password_hash(data.password, password):
+    
+        if check_password_hash(authMember.password, data['password']):
             # generates the JWT Token
-            hashedPassword = generate_password_hash(password)
-            addOrUpdateAuth(member.memberId, hashedPassword)
-
             try:
-                token = generateToken(member.memberId)
+                token = generateToken(authMember.memberId)
             except:
                 authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
                 return make_response(jsonify(authResp), 401)
-
-            secret = os.environ.get("SECRET_KEY", None)
-            if secret == None:
-                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
-                return make_response(jsonify(authResp), 401)                
-            
-            token = jwt.encode({
-                'memberId': str(member.memberId),
-                'exp' : datetime.utcnow() + timedelta(hours=24)
-            }, secret)
 
             authResp = make_response(jsonify({'succcess' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
@@ -58,19 +43,27 @@ class AuthenticationApi(Resource):
     # create an account
     def post(self):
         data = request.get_json(force=True)
+        print("Json data: ", data)
         authResp = {
             'reason': ''
         }
 
         email = data['email']
+        firstname = data['firstname']
+        lastname = data['lastname']
+        password = generate_password_hash(data['password'])
         member = getByEmail(email)
-
-        password = generate_password_hash(member.memberId)
-
+        
+        # If you are not a member, create a new member
         if not member:
-            addOrUpdateAuth(member.memberId, password)
+            member = addMember(email, firstname, lastname)
+            
+        authMember = getByMemberId(member.memberId)
+        # If you are a member but not authenticated yet
+        if not authMember:
+            newMember = addOrUpdateAuth(member.memberId, password)
             try:
-                token = generateToken(member.memberId)
+                token = generateToken(newMember.memberId)
             except:
                 authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
                 return make_response(jsonify(authResp), 401)
@@ -78,5 +71,14 @@ class AuthenticationApi(Resource):
             authResp = make_response(jsonify({'succcess' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
+        # If are an authenticated member
         else:
-            return make_response('A user with this email already exists!', 202)
+            try:
+                token = generateToken(authMember.memberId)
+            except:
+                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
+                return make_response(jsonify(authResp), 401)
+            
+            authResp = make_response(jsonify({'succcess' : True}))
+            authResp.set_cookie('hhub-token', value=str(token))
+            return authResp

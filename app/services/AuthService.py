@@ -1,22 +1,20 @@
 import datetime
-from msilib.schema import Error
 import os
 from app.db.models.Auth import Auth
-from sqlalchemy import func
 from app.db.db import db
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.exceptions.UnauthorizedException import UnauthorizedException
 import jwt
+from datetime import datetime, timedelta
 
 def generateToken(memberId):
     secret = os.environ.get("SECRET_KEY", None)
     if secret == None:
         raise Exception
-        return
     
     token = jwt.encode({
         'memberId': str(memberId),
-        'exp' : datetime.utcnow() + datetime.timedelta(hours=24)
+        'exp' : datetime.utcnow() + timedelta(minutes=1440)
     }, secret)
 
     return token
@@ -32,6 +30,7 @@ def addOrUpdateAuth(memberId, password):
             newAuth = Auth(memberId, password)
             db.session.add(newAuth)
             db.session.commit()
+            return newAuth
         else:
             auth.password = password
             db.session.commit()
