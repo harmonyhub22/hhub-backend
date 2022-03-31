@@ -33,16 +33,16 @@ def seed():
     s.add(member4)
     s.commit()
 
-    # hashedPwd = generate_password_hash('password')
-    # member1auth = Auth(member1.memberId, hashedPwd)
-    # member2auth = Auth(member2.memberId, hashedPwd)
-    # member3auth = Auth(member3.memberId, hashedPwd)
-    # member4auth = Auth(member4.memberId, hashedPwd)
-    # s.add(member1auth)
-    # s.add(member1auth)
-    # s.add(member1auth)
-    # s.add(member1auth)
-    # s.commit()
+    hashedPwd = generate_password_hash('password')
+    member1auth = Auth(member1.memberId, hashedPwd)
+    member2auth = Auth(member2.memberId, hashedPwd)
+    member3auth = Auth(member3.memberId, hashedPwd)
+    member4auth = Auth(member4.memberId, hashedPwd)
+    s.add(member1auth)
+    s.add(member2auth)
+    s.add(member3auth)
+    s.add(member4auth)
+    s.commit()
 
     # add friend requests
     s.add(MemberFriendRequest(member2.memberId, member1.memberId)) # vi requests greg
