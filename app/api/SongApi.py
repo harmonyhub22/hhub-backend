@@ -9,6 +9,7 @@ parser.add_argument('sessionId', type=str, required=False, location='args')
 parser.add_argument('name', type=str, required=False, location='args')
 
 class SongApi(Resource):
+    
     def get(self, id=None):
         if id != None:
             return jsonify(getById(id))
