@@ -24,3 +24,14 @@ Cases to test:
 def testGetLiveSession(app, client, auth):
     pass
 
+'''
+Route: api/session/<session ID>/end
+REST operation: POST
+Service method tested: endSession()
+Cases to test:
+1. no session is created, so you cant end one (catch BadRequestException)
+2. member is not yet in a session, so cant end one (catch BadRequestException)
+3. normal case: end a session the member is in. check that the session record has a properly updated end time
+'''
+def testEndSession(app, client, auth):
+    pass

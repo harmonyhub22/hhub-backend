@@ -3,6 +3,12 @@ import pytest
 def testSignup(client):
     pass
 
+'''
+Route: api/login
+REST operation: POST
+Service method tested: addMember()
+Cases to test:
+'''
 def testLogin(client):
     pass
 

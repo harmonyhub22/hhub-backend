@@ -73,6 +73,20 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
         db.session.rollback()
         raise ServerErrorException('could not edit layer')
 
+def deleteFile(sessionId, layerId, memberId):
+    session = getSessionById(sessionId)
+    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
+        raise BadRequestException('you cannot edit this layer')
+    layer = getById(layerId)
+
+    if layer.bucketUrl == None:
+        return layer
+    
+    deleteBucketFile(layer.bucketUrl)
+    layer.bucketUrl = None
+    db.session.commit()
+    return layer
+
 def deleteLayer(sessionId, memberId, layerId):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
@@ -91,16 +105,3 @@ def deleteLayer(sessionId, memberId, layerId):
     except Exception:
         db.session.rollback()
 
-def deleteFile(sessionId, layerId, memberId):
-    session = getSessionById(sessionId)
-    if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
-        raise BadRequestException('you cannot edit this layer')
-    layer = getById(layerId)
-
-    if layer.bucketUrl == None:
-        return layer
-    
-    deleteBucketFile(layer.bucketUrl)
-    layer.bucketUrl = None
-    db.session.commit()
-    return layer

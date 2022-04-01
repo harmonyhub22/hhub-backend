@@ -24,7 +24,6 @@ class Session(db.Model):
     layers: List[Layer] = field(default_factory=list)
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    genreId = db.Column('genre_id', UUID(as_uuid=True), db.ForeignKey(Genre.genreId), nullable=False)
     member1Id = db.Column('member1_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     member2Id = db.Column('member2_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     startTime = db.Column('start_time', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
