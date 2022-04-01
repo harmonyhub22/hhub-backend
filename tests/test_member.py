@@ -3,14 +3,12 @@ from app.db.db import db
 from app.db.models.Member import Member
 
 '''
-Route: api/member
+Route: api/members/<member ID>
 REST operation: GET
-Service method tested: getAll()
+Service method tested: getById()
 Cases to test:
-1. no accounts yet created, so queryset is empty
-2. create an account, so queryset has 1 member. check email, name, and password
-3. create another account, so queryset has 2 member. check email, name, and password
+1. trying to get a member with an invalid member ID. check that queryset is empty
+2. normal case: valid member ID 
 '''
-def testGetAllMembers(client, app):
+def testGetMemberById(client, app):
     pass
-
