@@ -127,6 +127,6 @@ def create_app(config_file):
         api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
 
         # Request pre and post processors
-        #app.before_request(getCookie)
+        app.before_request(getCookie)
 
         return app, sio

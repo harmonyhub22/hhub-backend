@@ -19,9 +19,13 @@ class AuthenticationApi(Resource):
             return make_response(jsonify(authResp), 401)
             
         member = getByEmail(data['email'])
-        authMember = getByMemberId(member.memberId)
 
-        if not member or not authMember:
+        if not member:
+            authResp['reason'] = "Account does not exist. Please create an account first!"
+            return make_response(jsonify(authResp), 403)
+        
+        authMember = getByMemberId(member.memberId)
+        if not authMember:
             authResp['reason'] = "Account does not exist. Please create an account first!"
             return make_response(jsonify(authResp), 403)
     
@@ -43,7 +47,7 @@ class AuthenticationApi(Resource):
     # create an account
     def post(self):
         data = request.get_json(force=True)
-        print("Json data: ", data)
+       
         authResp = {
             'reason': ''
         }

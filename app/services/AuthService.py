@@ -15,7 +15,7 @@ def generateToken(memberId):
     token = jwt.encode({
         'memberId': str(memberId),
         'exp' : datetime.utcnow() + timedelta(minutes=1440)
-    }, secret)
+    }, secret).decode('utf-8')
 
     return token
 
