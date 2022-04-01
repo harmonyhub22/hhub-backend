@@ -7,7 +7,6 @@ from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-from app.db.models.Genre import Genre
 from app.db.models.Layer import Layer
 from app.db.models.Member import Member
 
@@ -35,8 +34,7 @@ class Session(db.Model):
     layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
 
-    def __init__(self, genreId, member1Id, member2Id):
-        self.genreId = genreId
+    def __init__(self, member1Id, member2Id):
         self.member1Id = member1Id
         self.member2Id = member2Id
 
