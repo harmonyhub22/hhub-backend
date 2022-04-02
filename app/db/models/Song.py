@@ -21,7 +21,6 @@ class Song(db.Model):
     session: Session
     name: str
     duration: int
-    bucketUrl: str
     createdAt: DateTime
     tempo: int
     #numLikes: int
@@ -30,7 +29,6 @@ class Song(db.Model):
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)
     name = db.Column('name', db.String(30), nullable=False, default='My New Song')
     duration = db.Column('duration', db.Integer, default=60)
-    bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
     createdAt = db.Column('created_at', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     tempo = db.Column('tempo', db.Integer, default=120)
     session = db.relationship('Session', uselist=False, foreign_keys=[sessionId])
@@ -48,12 +46,10 @@ class Song(db.Model):
     '''
 
 
-    def __init__(self, sessionId, name, duration, bucketUrl, tempo = 120):
+    def __init__(self, sessionId, name, duration):
         self.sessionId = sessionId
         self.name = name
         self.duration = duration
-        self.bucketUrl = bucketUrl
-        self.tempo = tempo
 
     def __repr__(self):
         return '<song %s>' % str(self.songId)
