@@ -51,7 +51,7 @@ def create_app(config_file):
         
         db.create_all()
 
-        seed()
+        #seed()
 
         @app.route('/favicon.ico')
         def favicon():

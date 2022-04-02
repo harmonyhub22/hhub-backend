@@ -25,6 +25,7 @@ class AuthenticationApi(Resource):
             return make_response(jsonify(authResp), 403)
         
         authMember = getByMemberId(member.memberId)
+        print("Authenticated member is", authMember)
         if not authMember:
             authResp['reason'] = "Account does not exist. Please create an account first!"
             return make_response(jsonify(authResp), 403)
