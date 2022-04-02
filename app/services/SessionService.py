@@ -32,10 +32,6 @@ def createSession(member1Id, member2Id, genreId):
     if member2Id == member1Id:
         raise BadRequestException('cannot start session with yourself')
 
-    genre = getGenreById(genreId)
-    if not genre:
-        raise BadRequestException('genreId does not exist')
-
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
