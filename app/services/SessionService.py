@@ -3,11 +3,9 @@ import uuid
 from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import getById as getMemberById
-from app.services.GenreService import getById as getGenreById
+from app.bucket.bucket import uploadBucketFile
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
-from sqlalchemy.sql import func
-
 
 def getById(id):
     return Session.query.get(id)
@@ -33,11 +31,6 @@ def createSession(member1Id, member2Id, genreId):
     if member2Id == member1Id:
         print('cannot start a session with yourself')
         raise BadRequestException('cannot start session with yourself')
-
-    genre = getGenreById(genreId)
-    if not genre:
-        print('genreId does not exist')
-        raise BadRequestException('genreId does not exist')
 
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
@@ -68,3 +61,14 @@ def endSession(memberId, sessionId):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('cannot end Session')
+
+def uploadSong(sessionId, songFile, fileName, contentType):
+    session = getById(sessionId)
+    if session == None:
+        raise BadRequestException('session has ended, cannot save song')
+
+    url = uploadBucketFile(songFile, fileName, contentType)
+    session.bucketUrl = url
+    db.session.commit()
+
+    return session

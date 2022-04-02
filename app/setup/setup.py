@@ -7,7 +7,6 @@ from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
-from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
@@ -16,16 +15,11 @@ from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.NoAuth import getCookie
 from app.socket.init import sio
-from app.controller.layerUpload import layerUploadBlueprint
+from app.controller.upload import layerUploadBlueprint
 
 def create_app(config_file):
-    """
-    Creating and returning the app
-    """
-
     app_path = os.path.dirname(os.path.abspath(__file__))
     project_folder = os.path.expanduser(app_path)
-    #load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
 
@@ -53,10 +47,9 @@ def create_app(config_file):
 
         @app.route('/favicon.ico')
         def favicon():
-            return send_from_directory(app.root_path,
-                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+            return send_from_directory(app.root_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
     
-        ### CORS section
+        # CORS section
         @app.after_request
         def after_request_func(response):
             if request.method == 'OPTIONS':
@@ -68,7 +61,6 @@ def create_app(config_file):
             response.headers.add('Access-Control-Allow-Credentials', 'true')
             response.headers.add('Access-Control-Allow-Origin', os.getenv('CORS_ORIGIN'))
             return response
-        ### end CORS section
 
         @app.route('/')
         def home():
@@ -87,7 +79,6 @@ def create_app(config_file):
         api.add_resource(AuthenticationApi, '/api/login', '/api/signup')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
-        api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
         api.add_resource(SessionLiveApi, '/api/session/live')
         api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
         api.add_resource(SessionEndApi, '/api/session/<id>/end')

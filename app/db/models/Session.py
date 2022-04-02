@@ -24,7 +24,6 @@ class Session(db.Model):
     layers: List[Layer] = field(default_factory=list)
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    genreId = db.Column('genre_id', UUID(as_uuid=True), db.ForeignKey(Genre.genreId), nullable=False)
     member1Id = db.Column('member1_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     member2Id = db.Column('member2_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     turnCount = db.Column('turn_count', db.Integer, nullable=False, default=0)
@@ -32,7 +31,7 @@ class Session(db.Model):
     endTime = db.Column('end_time', db.DateTime)
     member1 = db.relationship('Member', uselist=False, foreign_keys=[member1Id])
     member2 = db.relationship('Member', uselist=False, foreign_keys=[member2Id])
-    bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
+    bucketUrl = db.Column('bucket_url', db.String(520), nullable=False, default=str('https://' + os.getenv('S3_BUCKET_NAME') + '.s3.us-east-2.amazonaws.com/'))
     layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
 
     def __init__(self, member1Id, member2Id):
