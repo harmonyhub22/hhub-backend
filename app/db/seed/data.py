@@ -1,5 +1,6 @@
 import uuid
 from app.db.db import db
+from app.db.models.Auth import Auth
 from app.db.models.Member import Member
 from app.db.models.MemberFriend import MemberFriend
 from app.db.models.Genre import Genre
@@ -8,6 +9,7 @@ from app.db.models.Session import Session
 from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Layer import Layer
 from app.db.models.Song import Song
+from  werkzeug.security import generate_password_hash, check_password_hash
 
 def seed():
     s = db.session()
@@ -24,11 +26,22 @@ def seed():
     member2.memberId = uuid.UUID('0dfedda5-ddd3-481f-90d9-6ee388c4093e')
     member3.memberId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
     member4.memberId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+
     s.add(member1)
     s.add(member2)
     s.add(member3)
     s.add(member4)
+    s.commit()
 
+    hashedPwd = generate_password_hash('password')
+    member1auth = Auth(member1.memberId, hashedPwd)
+    member2auth = Auth(member2.memberId, hashedPwd)
+    member3auth = Auth(member3.memberId, hashedPwd)
+    member4auth = Auth(member4.memberId, hashedPwd)
+    s.add(member1auth)
+    s.add(member2auth)
+    s.add(member3auth)
+    s.add(member4auth)
     s.commit()
 
     # add friend requests

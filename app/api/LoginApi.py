@@ -6,6 +6,7 @@ class LoginApi(Resource):
 
     def post(self):
         data = request.get_json(force=True)
+        print("Json data: ", data)
         memberId = None
         try:
             memberId = request.headers['MEMBERID']
@@ -15,7 +16,7 @@ class LoginApi(Resource):
             print('logging in')
             member = getByEmail(data['email'])
             if member == None:
-                member = addMember(memberId, data['email'], data['firstname'], data['lastname'])
+                member = addMember(data['email'], data['firstname'], data['lastname'])
             print('memberId', member.memberId)
             resp = make_response(jsonify(member), 200)
             resp.set_cookie('memberId', value=str(member.memberId))
