@@ -2,9 +2,6 @@ import uuid
 from app.db.db import db
 from app.db.models.Auth import Auth
 from app.db.models.Member import Member
-from app.db.models.MemberFriend import MemberFriend
-from app.db.models.Genre import Genre
-from app.db.models.MemberFriendRequest import MemberFriendRequest
 from app.db.models.Session import Session
 from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Layer import Layer
@@ -44,29 +41,6 @@ def seed():
     s.add(member4auth)
     s.commit()
 
-    # add friend requests
-    s.add(MemberFriendRequest(member2.memberId, member1.memberId)) # vi requests greg
-
-    # add friends
-    s.add(MemberFriend(member1.memberId, member3.memberId)) # vi and will are friends
-
-    # add genres
-    genre1 = Genre('Alt')
-    genre2 = Genre('Country')
-    genre3 = Genre('R&B')
-    genre4 = Genre('Jazz')
-    genre5 = Genre('Indie')
-    genre6 = Genre('Pop')
-    genre1.genreId = uuid.UUID('dff3c144-eb29-41d3-82ea-9bcd200fc891')
-    s.add(genre1)
-    s.add(genre2)
-    s.add(genre3)
-    s.add(genre4)
-    s.add(genre5)
-    s.add(genre6)
-
-    s.commit()
-
     # matching queues
     queue1 = MatchingQueue(member2.memberId)
     queue1.matchingQueueId = '1c74a6fd-b7b9-4fe4-96fd-f7e78eb6d2c2'
@@ -74,7 +48,7 @@ def seed():
     #s.add(MatchingQueue(member3.memberId)) # will joins the queue
 
     # sessions
-    session1 = Session(genre1.genreId, member1.memberId, member4.memberId) # greg and dean join a session
+    session1 = Session(member1.memberId, member4.memberId) # greg and dean join a session
     session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
     s.add(session1)
 

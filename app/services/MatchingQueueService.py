@@ -26,7 +26,7 @@ def match(member1Id): # if there are 2 users in the queue, create the session wi
     queueItem = getTop()
     db.session.delete(queueItem)
     db.session.commit()
-    newSession = createSession(member1Id, queueItem.memberId, uuid.UUID('dff3c144-eb29-41d3-82ea-9bcd200fc891')) # default genre
+    newSession = createSession(member1Id, queueItem.memberId)
     return newSession
 
 def joinOrAttemptMatch(memberId):

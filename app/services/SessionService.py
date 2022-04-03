@@ -3,7 +3,6 @@ import uuid
 from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import getById as getMemberById
-from app.services.GenreService import getById as getGenreById
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from sqlalchemy.sql import func
@@ -24,7 +23,7 @@ def getAll():
 def getLiveSession(memberId):
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
-def createSession(member1Id, member2Id, genreId):
+def createSession(member1Id, member2Id):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     if not member2 or not member1:
@@ -34,11 +33,6 @@ def createSession(member1Id, member2Id, genreId):
         print('cannot start a session with yourself')
         raise BadRequestException('cannot start session with yourself')
 
-    genre = getGenreById(genreId)
-    if not genre:
-        print('genreId does not exist')
-        raise BadRequestException('genreId does not exist')
-
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
@@ -46,7 +40,7 @@ def createSession(member1Id, member2Id, genreId):
         raise BadRequestException('you or other member is already in a Session')
 
     try:
-        record = Session(genreId, member1Id, member2Id)
+        record = Session(member1Id, member2Id)
         db.session.add(record)
         db.session.commit()
         return record

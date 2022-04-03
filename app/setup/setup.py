@@ -2,13 +2,11 @@ from distutils.log import debug
 import os
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
-from app.api.LoginApi import LoginApi
 from app.api.LogoutApi import LogoutApi
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
 from app.db.seed.data import seed
 from app.api.MemberApi import MemberApi
-from app.api.GenreApi import GenreApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
@@ -57,35 +55,6 @@ def create_app(config_file):
         def favicon():
             return send_from_directory(app.root_path,
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
-        '''
-        @app.before_request
-        def authenticate():
-            if request.path == '/logout': # let them logout no matter what
-                return
-            memberid = getSession()
-            if not memberid and request.path == '/google-login': # don't check for session when google redirects
-                return
-            if not memberid: # check for session
-                print('you must login')
-                authUrl = login()
-                return redirect(authUrl)
-                #return jsonify({ 'url': authUrl }), 302
-            if getById(memberid) == None: # the database doesn't have them so logout
-                return jsonify({ 'url': authUrl }), 302
-                #return redirect('/logout')
-            request.environ['HTTP_MEMBERID'] = memberid
-        
-        @app.route('/google-login')
-        def authCallback():
-            if not request.args.get('state'):
-                authUrl = login()
-                return jsonify({ 'url': authUrl }), 302
-            verifyLogin()
-            getOrCreateMember()
-            # return redirect(os.getenv('CORS_ORIGIN'))
-            return jsonify({ 'success': True })
-        '''
     
         ### CORS section
         @app.after_request
@@ -118,7 +87,6 @@ def create_app(config_file):
         api.add_resource(AuthenticationApi, '/api/login', '/api/signup')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
-        api.add_resource(GenreApi, '/api/genres', '/api/genres/<id>')
         api.add_resource(SessionLiveApi, '/api/session/live')
         api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
