@@ -21,6 +21,7 @@ class Session(db.Model):
     endTime: DateTime
     member1: Member
     member2: Member
+    bucketUrl: str
     layers: List[Layer] = field(default_factory=list)
 
     sessionId = db.Column('session_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -31,6 +32,7 @@ class Session(db.Model):
     endTime = db.Column('end_time', db.DateTime)
     member1 = db.relationship('Member', uselist=False, foreign_keys=[member1Id])
     member2 = db.relationship('Member', uselist=False, foreign_keys=[member2Id])
+    bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
     layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
 
     def __init__(self, member1Id, member2Id):
