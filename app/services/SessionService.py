@@ -3,11 +3,9 @@ import uuid
 from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import getById as getMemberById
-from app.services.GenreService import getById as getGenreById
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from sqlalchemy.sql import func
-
 
 def getById(id):
     return Session.query.get(id)
