@@ -1,6 +1,5 @@
 from distutils.log import debug
 import os
-from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
 from app.api.LoginApi import LoginApi
@@ -14,6 +13,7 @@ from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
+from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.NoAuth import getCookie
 from app.socket.init import sio
@@ -26,7 +26,7 @@ def create_app(test_config=None):
 
     app_path = os.path.dirname(os.path.abspath(__file__))
     project_folder = os.path.expanduser(app_path)
-    load_dotenv(os.path.join(project_folder, '.env'))
+    #load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
 
@@ -94,7 +94,7 @@ def create_app(test_config=None):
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')
-        api.add_resource(LoginApi, '/api/login')
+        api.add_resource(AuthenticationApi, '/api/login', '/api/signup')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
         api.add_resource(SessionLiveApi, '/api/session/live')
