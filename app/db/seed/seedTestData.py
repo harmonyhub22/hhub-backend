@@ -7,27 +7,30 @@ from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Layer import Layer
 from app.db.models.Song import Song
 from  werkzeug.security import generate_password_hash, check_password_hash
-from app.services.MemberService import getAll as gam
-from app.services.MatchingQueueService import getAll as gaq
+from app.services.MemberService import getAll as getAllMembers
+from app.services.MatchingQueueService import getAll as getAllQueue
+from app.services.SessionService import getAll as getAllSessions
 
 def seedTest():
     s = db.session()
 
-    queues = gaq()
+    queues = getAllQueue()
     for q in queues:
-        s.delete(q)
-    s.commit()
+        print(q)
+    #     s.delete(q)
+    # s.commit()
 
+    sessions = getAllSessions()
+    for ss in sessions:
+        print(ss)
+    #     s.delete(ss)
+    # s.commit()
 
-    members = gam()
+    members = getAllMembers()
     for m in members:
         print(m)
-        s.delete(m)
-    s.commit()
-
-    members = gam()
-    for m in members:
-        print(m.firstname)
+    #     s.delete(m)
+    # s.commit()
 
 
     # member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri')
