@@ -22,7 +22,7 @@ def getAll():
 def getLiveSession(memberId):
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
-def createSession(member1Id, member2Id, genreId):
+def createSession(member1Id, member2Id):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     if not member2 or not member1:
@@ -36,7 +36,7 @@ def createSession(member1Id, member2Id, genreId):
         raise BadRequestException('you or other member is already in a Session')
 
     try:
-        record = Session(genreId, member1Id, member2Id)
+        record = Session(member1Id, member2Id)
         db.session.add(record)
         db.session.commit()
         return record
