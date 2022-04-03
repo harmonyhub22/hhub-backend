@@ -22,7 +22,6 @@ class Song(db.Model):
     name: str
     duration: int
     createdAt: DateTime
-    tempo: int
     numLikes: int
 
     songId = db.Column('song_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -30,7 +29,6 @@ class Song(db.Model):
     name = db.Column('name', db.String(30), nullable=False, default='My New Song')
     duration = db.Column('duration', db.Integer, default=60)
     createdAt = db.Column('created_at', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    tempo = db.Column('tempo', db.Integer, default=120)
     numLikes = db.Column('num_likes', db.Integer, default=0)
     session = db.relationship('Session', uselist=False, foreign_keys=[sessionId])
 
