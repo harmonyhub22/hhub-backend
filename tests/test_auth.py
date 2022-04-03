@@ -1,7 +1,5 @@
 import pytest
 
-# note: we should wait until password stuff is merged into master before testing auth
-
 '''
 Route: api/signup
 REST operation: POST

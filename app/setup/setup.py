@@ -2,7 +2,6 @@ from distutils.log import debug
 import os
 from flask import Flask, jsonify, make_response, redirect, request, session, send_from_directory
 from flask_restful import Api
-from app.api.LoginApi import LoginApi
 from app.api.LogoutApi import LogoutApi
 from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
