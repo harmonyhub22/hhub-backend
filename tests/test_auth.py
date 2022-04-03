@@ -12,7 +12,12 @@ Cases to test:
 '''
 @pytest.mark.order(1)
 def testSignup(client):
-    
+    data = {
+        'email': '',
+        'firstname': '',
+        'lastname': '',
+        'password': '',
+    }
     pass
 
 '''
@@ -47,5 +52,5 @@ def testLogout(client, auth):
 
     with client:
         auth.logout()
-        # TODO: what are we checking?
+        assert
     '''

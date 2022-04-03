@@ -1,3 +1,4 @@
+from base64 import b64encode
 import datetime
 import pytest
 from app.db.db import db
@@ -17,7 +18,16 @@ Cases to test:
 4. join the queue again as the same user, so dont get added, and receive existing queue record
 '''
 def testJoinQueue(app, client, auth):
-    auth.login()
+    res = auth.login()
+    cookie = next(
+        (cookie for cookie in client.cookie_jar if cookie.name == "hhub-token"),
+        None
+    )
+    print("DEBUG: cookie is", cookie)
+    assert cookie is not None
+    # token = res['']
+    # client.set_cookie()
+
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
 
@@ -29,9 +39,8 @@ def testJoinQueue(app, client, auth):
         assert query[0].memberId == willId
 
     # case 1
-    response = client.post('/api/queue', data={
-        'MEMBERID': deanId
-    })
+    credentials = b64encode(b"dean27@tamu.edu:password").decode('utf-8')
+    response = client.post('/api/queue', headers={"Authorization": "Basic {}".format(credentials)}, data={'MEMBERID': deanId})
     assert response == None
     with app.app_context():
         query = MatchingQueue.query.all()

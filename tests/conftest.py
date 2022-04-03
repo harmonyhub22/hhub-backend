@@ -14,10 +14,10 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, email='dean27@tamu.edu', firstname='Dean', lastname='Something'):
+    def login(self, email='dean27@tamu.edu', password='password'):
         return self._client.post(
             '/api/login',
-            data={'email': email, 'firstname': firstname, 'lastname': lastname}
+            data={'email': email, 'password': password}
         )
 
     def logout(self):
