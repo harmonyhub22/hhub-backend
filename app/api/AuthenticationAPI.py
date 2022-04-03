@@ -7,6 +7,7 @@ from  werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
 class AuthenticationApi(Resource):
+
     # log in
     def put(self):
         data = request.get_json(force=True)
@@ -14,24 +15,28 @@ class AuthenticationApi(Resource):
             'reason': ''
         }
 
-        if not data or not data.get('email') or not data.get('password'):
-            authResp['reason'] = "Please provide both an email and password!"
-            return make_response(jsonify(authResp), 401)
+        if not data:
+            authResp['reason'] = "Please provide your information."
+            return make_response(jsonify(authResp), 400)
+        elif not data.get('email'):
+            authResp['reason'] = "Please provide your email."
+            return make_response(jsonify(authResp), 400)
+        elif not data.get('password'):
+            authResp['reason'] = "Please provide a password."
+            return make_response(jsonify(authResp), 400)
             
         member = getByEmail(data['email'])
 
         if not member:
             authResp['reason'] = "Account does not exist. Please create an account first!"
-            return make_response(jsonify(authResp), 403)
+            return make_response(jsonify(authResp), 400)
         
         authMember = getByMemberId(member.memberId)
-        print("Authenticated member is", authMember)
         if not authMember:
             authResp['reason'] = "Account does not exist. Please create an account first!"
-            return make_response(jsonify(authResp), 403)
+            return make_response(jsonify(authResp), 400)
     
         if check_password_hash(authMember.password, data['password']):
-            # generates the JWT Token
             try:
                 token = generateToken(authMember.memberId)
             except:
@@ -41,17 +46,30 @@ class AuthenticationApi(Resource):
             authResp = make_response(jsonify({'succcess' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
-        
-        authResp['reason'] = "Incorrect password!"
-        return make_response(jsonify(authResp), 403)
+        else:
+            authResp['reason'] = "Incorrect password!"
+            return make_response(jsonify(authResp), 403)
     
-    # create an account
+    # sign up
     def post(self):
         data = request.get_json(force=True)
        
         authResp = {
             'reason': ''
         }
+
+        if not data:
+            authResp['reason'] = "Please provide your information."
+            return make_response(jsonify(authResp), 400)
+        elif not data.get('email'):
+            authResp['reason'] = "Please provide your email."
+            return make_response(jsonify(authResp), 400)
+        elif not data.get('password'):
+            authResp['reason'] = "Please provide a password."
+            return make_response(jsonify(authResp), 400)
+        elif not data.get('lastname') or not data.get('firstname'):
+            authResp['reason'] = "Please provide your first and last name."
+            return make_response(jsonify(authResp), 400)
 
         email = data['email']
         firstname = data['firstname']
@@ -64,6 +82,7 @@ class AuthenticationApi(Resource):
             member = addMember(email, firstname, lastname)
             
         authMember = getByMemberId(member.memberId)
+
         # If you are a member but not authenticated yet
         if not authMember:
             newMember = addOrUpdateAuth(member.memberId, password)
@@ -76,6 +95,7 @@ class AuthenticationApi(Resource):
             authResp = make_response(jsonify({'succcess' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
+
         # If are an authenticated member
         else:
             try:
