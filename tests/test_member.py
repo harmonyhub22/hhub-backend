@@ -1,6 +1,7 @@
 import pytest
 from app.db.db import db
 from app.db.models.Member import Member
+from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
 import uuid
 '''
 Route: api/members/<member ID>
@@ -10,17 +11,24 @@ Cases to test:
 1. trying to get a member with an invalid member ID. check that queryset is empty
 2. normal case: valid member ID 
 '''
-def testGetMemberById(client, app,auth):
+def testGetMemberById(client, app, auth):
     auth.login()
-    #case 1
-    nullid = uuid.UUID('28cf2179-74ed-0000-0000-3c09bd904365')
+
+    deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+    willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
+
     with app.app_context():
-        query = Member.query.get(nullid)
-        assert not query
+        authMember = getByMemberIdAuth(deanId)
+        token = generateToken(authMember.memberId)
+        client.set_cookie(app, 'hhub-token', str(token))
+
+    #case 1
+    res = client.get('/api/members/28cf2179-74ed-0000-0000-3c09bd904365')
+    print(res.data)
+    print(res.status_code)
+    assert res.data == b'null\n'
+
     #case 2
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
-    with app.app_context():
-        query = Member.query.get(deanId)
-        assert len(query) == 1
-        assert query[0].member_id == 0
-    pass
+    res = client.get('/api/members/28cf2179-74ed-4fab-a14c-3c09bd904365')
+    assert res is not None
