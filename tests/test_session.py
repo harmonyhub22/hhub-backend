@@ -1,7 +1,10 @@
 import pytest
 from app.db.db import db
 from app.db.models.Session import Session
+import uuid
+from app.exceptions.BadRequestException import BadRequestException
 
+from app.services.AuthService import getByMemberId
 '''
 Route: api/session
 REST operation: GET
@@ -12,6 +15,23 @@ Cases to test:
 3. normal case: valid session ID, member ID exists, queryset should have only 1 session. check metadata
 '''
 def testGetSession(app, client, auth):
+    auth.login()
+    #case 1
+    nullId = uuid.UUID('28cf2179-74ed-0000-a14c-3c09bd904365')
+    with pytest.raises(BadRequestException) as info:
+        record = client.get('api/session', data = {
+            nullId
+        })
+    assert "no session with this ID" in str(info.value)
+    #case 2 
+    deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+    with pytest.raises(BadRequestException) as info:
+        record = client.get('api/session', data = {
+            'memberid': deanId
+        })
+    assert "no session with this member" in str(info.value)
+    #case 3
+
     pass
 
 '''
@@ -21,7 +41,15 @@ Service method tested: getLiveSession()
 Cases to test:
 1. 
 '''
+
 def testGetLiveSession(app, client, auth):
+    auth.login()
+    #test = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
+    #case 1
+    deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+    with pytest.raises(BadRequestException) as info:
+        checkSession = client.get('/api/sessions', data = {'MEMBERID': deanId})
+    assert str(info.value)
     pass
 
 '''
