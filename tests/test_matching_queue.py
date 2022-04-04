@@ -4,7 +4,9 @@ import pytest
 from app.db.db import db
 from app.db.models.MatchingQueue import MatchingQueue
 from app.exceptions.BadRequestException import BadRequestException
-from app.services.SessionService import getByMemberId
+from app.services.AuthService import generateToken
+from app.services.SessionService import getByMemberId as getByMemberIdSession
+from app.services.AuthService import getByMemberId as getByMemberIdAuth
 import uuid
 
 '''
@@ -17,19 +19,27 @@ Cases to test:
 3. join the queue for the first time, so get added to it, queue queryset has now 1 member
 4. join the queue again as the same user, so dont get added, and receive existing queue record
 '''
+#@pytest.mark.order(1)
 def testJoinQueue(app, client, auth):
     res = auth.login()
-    cookie = next(
-        (cookie for cookie in client.cookie_jar if cookie.name == "hhub-token"),
-        None
-    )
-    print("DEBUG: cookie is", cookie)
-    assert cookie is not None
-    # token = res['']
-    # client.set_cookie()
 
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
+
+    with app.app_context():
+        authMember = getByMemberIdAuth(deanId)
+        print(authMember)
+        token = generateToken(authMember.memberId)
+        print(token)
+        client.set_cookie(app, 'hhub-token', str(token))
+
+    # cookie = next(
+    #     (cookie for cookie in client.cookie_jar if cookie.name == "hhub-token"),
+    #     None
+    # )
+    # print("DEBUG: cookie is", cookie)
+    # assert cookie is not None
+
 
     # initial checking (Will is in the queue (from seed data))
     with app.app_context():
@@ -39,8 +49,9 @@ def testJoinQueue(app, client, auth):
         assert query[0].memberId == willId
 
     # case 1
-    credentials = b64encode(b"dean27@tamu.edu:password").decode('utf-8')
-    response = client.post('/api/queue', headers={"Authorization": "Basic {}".format(credentials)}, data={'MEMBERID': deanId})
+    #credentials = b64encode(b"dean27@tamu.edu:password").decode('utf-8')
+    #response = client.post('/api/queue', headers={"Authorization": "Basic {}".format(credentials)}, data={'MEMBERID': deanId})
+    response = client.post('/api/queue')
     assert response == None
     with app.app_context():
         query = MatchingQueue.query.all()
@@ -56,7 +67,7 @@ def testJoinQueue(app, client, auth):
     
     # end the session before cases 3 and 4
     with app.app_context():
-        session = getByMemberId(deanId)
+        session = getByMemberIdSession(deanId)
         session.endTime = datetime.datetime.utcnow()
         db.session.commit()
     
