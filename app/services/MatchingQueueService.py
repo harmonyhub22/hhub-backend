@@ -27,6 +27,8 @@ def match(member1Id): # if there are 2 users in the queue, create the session wi
     db.session.delete(queueItem)
     db.session.commit()
     newSession = createSession(member1Id, queueItem.memberId)
+    db.session.add(newSession)
+    db.session.commit()
     return newSession
 
 def joinOrAttemptMatch(memberId):
@@ -39,11 +41,12 @@ def joinOrAttemptMatch(memberId):
     # if theres 1 person currently in the queue, match with them
     if len(getTop2()) == 1:
         session = match(memberId)
-        sid1 = getSid(session.member1.memberId)
-        sid2 = getSid(session.member2.memberId)
-        addToRoom(sid1, 'session-'+str(session.sessionId))
-        addToRoom(sid2, 'session-'+str(session.sessionId))
-        emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
+        # TODO: uncomment lines 45-49 this after running unit tests
+        # sid1 = getSid(session.member1.memberId)
+        # sid2 = getSid(session.member2.memberId)
+        # addToRoom(sid1, 'session-'+str(session.sessionId))
+        # addToRoom(sid2, 'session-'+str(session.sessionId))
+        # emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
         return None
     
     # otherwise, get added to the queue

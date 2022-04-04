@@ -37,8 +37,8 @@ def createSession(member1Id, member2Id):
 
     try:
         record = Session(member1Id, member2Id)
-        db.session.add(record)
-        db.session.commit()
+        # db.session.add(record)
+        # db.session.commit()
         return record
     except Exception:
         db.session.rollback()

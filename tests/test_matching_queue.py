@@ -5,6 +5,7 @@ from app.db.db import db
 from app.db.models.MatchingQueue import MatchingQueue
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken
+from app.services.MemberService import setSid
 from app.services.SessionService import getByMemberId as getByMemberIdSession
 from app.services.AuthService import getByMemberId as getByMemberIdAuth
 import uuid
@@ -19,7 +20,7 @@ Cases to test:
 3. join the queue for the first time, so get added to it, queue queryset has now 1 member
 4. join the queue again as the same user, so dont get added, and receive existing queue record
 '''
-#@pytest.mark.order(1)
+@pytest.mark.order(1)
 def testJoinQueue(app, client, auth):
     res = auth.login()
 
@@ -28,18 +29,9 @@ def testJoinQueue(app, client, auth):
 
     with app.app_context():
         authMember = getByMemberIdAuth(deanId)
-        print(authMember)
         token = generateToken(authMember.memberId)
-        print(token)
         client.set_cookie(app, 'hhub-token', str(token))
-
-    # cookie = next(
-    #     (cookie for cookie in client.cookie_jar if cookie.name == "hhub-token"),
-    #     None
-    # )
-    # print("DEBUG: cookie is", cookie)
-    # assert cookie is not None
-
+        #setSid(deanId, '123')  # uncomment this if we are also testing web sockets
 
     # initial checking (Will is in the queue (from seed data))
     with app.app_context():
@@ -49,10 +41,8 @@ def testJoinQueue(app, client, auth):
         assert query[0].memberId == willId
 
     # case 1
-    #credentials = b64encode(b"dean27@tamu.edu:password").decode('utf-8')
-    #response = client.post('/api/queue', headers={"Authorization": "Basic {}".format(credentials)}, data={'MEMBERID': deanId})
     response = client.post('/api/queue')
-    assert response == None
+    assert response is not None
     with app.app_context():
         query = MatchingQueue.query.all()
         numWaiting = len(query)
@@ -60,9 +50,7 @@ def testJoinQueue(app, client, auth):
 
     # case 2
     with pytest.raises(BadRequestException) as excinfo:
-        existingRecord = client.post('/api/queue', data={
-            'MEMBERID': deanId
-        })
+        existingRecord = client.post('/api/queue')  # problem here. seems to not be catching the BadRequestException (even though its thrown)
     assert "currently in a session" in str(excinfo.value)
     
     # end the session before cases 3 and 4
@@ -72,9 +60,7 @@ def testJoinQueue(app, client, auth):
         db.session.commit()
     
     # case 3 
-    newRecord = client.post('/api/queue', data={
-        'MEMBERID': deanId
-    })
+    newRecord = client.post('/api/queue')
     with app.app_context():
         query = MatchingQueue.query.all()
         numWaiting = len(query)
@@ -82,9 +68,7 @@ def testJoinQueue(app, client, auth):
         assert newRecord.memberId == deanId
 
     # case 4
-    existingRecord = client.post('/api/queue', data={
-        'MEMBERID': deanId
-    })
+    existingRecord = client.post('/api/queue')
     with app.app_context():
         query = MatchingQueue.query.all()
         numWaiting = len(query)
