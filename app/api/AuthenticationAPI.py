@@ -1,8 +1,10 @@
 import os
 from flask import jsonify, make_response, request, session
 from flask_restful import Resource
-from app.services.AuthService import *
-from app.services.MemberService import *
+from app.services.AuthService import getByMemberId as getAuthByMemberId
+from app.services.AuthService import generateToken, addOrUpdateAuth
+from app.services.MemberService import getByEmail as getMemberByEmail
+from app.services.MemberService import addMember
 from  werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
@@ -15,6 +17,8 @@ class AuthenticationApi(Resource):
             'reason': ''
         }
 
+        print(data)
+
         if not data:
             authResp['reason'] = "Please provide your information."
             return make_response(jsonify(authResp), 400)
@@ -25,13 +29,13 @@ class AuthenticationApi(Resource):
             authResp['reason'] = "Please provide a password."
             return make_response(jsonify(authResp), 400)
             
-        member = getByEmail(data['email'])
+        member = getMemberByEmail('gcpetri@tamu.edu')
 
         if not member:
             authResp['reason'] = "Account does not exist. Please create an account first!"
             return make_response(jsonify(authResp), 400)
         
-        authMember = getByMemberId(member.memberId)
+        authMember = getAuthByMemberId(member.memberId)
         if not authMember:
             authResp['reason'] = "Account does not exist. Please create an account first!"
             return make_response(jsonify(authResp), 400)
@@ -75,13 +79,13 @@ class AuthenticationApi(Resource):
         firstname = data['firstname']
         lastname = data['lastname']
         password = generate_password_hash(data['password'])
-        member = getByEmail(email)
+        member = getMemberByEmail(email)
         
         # If you are not a member, create a new member
         if not member:
             member = addMember(email, firstname, lastname)
             
-        authMember = getByMemberId(member.memberId)
+        authMember = getAuthByMemberId(member.memberId)
 
         # If you are a member but not authenticated yet
         if not authMember:
