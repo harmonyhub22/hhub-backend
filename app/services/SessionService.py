@@ -20,6 +20,9 @@ def getAll():
     return Session.query.all()
 
 def getLiveSession(memberId):
+    # session = Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
+    # if session != None:
+    #     print(session.endTime)
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
 def createSession(member1Id, member2Id):
@@ -47,8 +50,10 @@ def createSession(member1Id, member2Id):
 def endSession(memberId, sessionId):
     session = Session.query.get(sessionId)
     memberId = uuid.UUID(memberId)
-    if session == None or (session.member1Id != memberId and session.member2Id != memberId):
-        raise BadRequestException('you cannot modify this Session')
+    if session == None:
+        raise BadRequestException('session does not exist')
+    if session.member1Id != memberId and session.member2Id != memberId:
+        raise BadRequestException('you are not in this session')
     try:
         session.endTime = datetime.datetime.utcnow()
         db.session.commit()

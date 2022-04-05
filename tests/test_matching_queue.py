@@ -1,8 +1,11 @@
 from base64 import b64encode
 import datetime
+from http import HTTPStatus
+import json
 import pytest
 from app.db.db import db
 from app.db.models.MatchingQueue import MatchingQueue
+from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken
 from app.services.MemberService import setSid
@@ -20,13 +23,11 @@ Cases to test:
 3. join the queue for the first time, so get added to it, queue queryset has now 1 member
 4. join the queue again as the same user, so dont get added, and receive existing queue record
 '''
-@pytest.mark.order(1)
 def testJoinQueue(app, client, auth):
-    res = auth.login()
-
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
 
+    auth.login()
     with app.app_context():
         authMember = getByMemberIdAuth(deanId)
         token = generateToken(authMember.memberId)
@@ -49,9 +50,10 @@ def testJoinQueue(app, client, auth):
         assert numWaiting == 0
 
     # case 2
-    with pytest.raises(BadRequestException) as excinfo:
-        existingRecord = client.post('/api/queue')  # problem here. seems to not be catching the BadRequestException (even though its thrown)
-    assert "currently in a session" in str(excinfo.value)
+    response = client.post('/api/queue')
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "currently in a session" in jsonResponse['message']
     
     # end the session before cases 3 and 4
     with app.app_context():
@@ -60,15 +62,16 @@ def testJoinQueue(app, client, auth):
         db.session.commit()
     
     # case 3 
-    newRecord = client.post('/api/queue')
+    response = client.post('/api/queue')
     with app.app_context():
         query = MatchingQueue.query.all()
         numWaiting = len(query)
         assert numWaiting == 1
-        assert newRecord.memberId == deanId
+        jsonResponse = json.loads(response.data.decode('utf-8'))
+        assert jsonResponse['member']['memberId'] == '28cf2179-74ed-4fab-a14c-3c09bd904365'
 
     # case 4
-    existingRecord = client.post('/api/queue')
+    response = client.post('/api/queue')
     with app.app_context():
         query = MatchingQueue.query.all()
         numWaiting = len(query)
@@ -80,10 +83,28 @@ Route: api/queue
 REST operation: DELETE
 Service methods tested: leave(), getByMemberId()
 Cases to test:
-1. trying to leave a queue that you havent joined (nothing happens, just check that queryset is same size)
-2. normal case: join the queue (as the first one), then leave. check that queryset is empty
+1. normal case: join the queue (as the first one), then leave. check that queryset is empty
+2. trying to leave a queue that you havent joined (nothing happens, just check that queryset is same size)
 '''
 def testLeaveQueue(app, client, auth):
-    pass
-    # auth.login()
-    # response = client.delete('/api/queue/28cf2179-74ed-4fab-a14c-3c09bd904365')
+    deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+
+    auth.login()
+    with app.app_context():
+        authMember = getByMemberIdAuth(deanId)
+        token = generateToken(authMember.memberId)
+        client.set_cookie(app, 'hhub-token', str(token))
+    
+    # case 1
+    response = client.post('/api/queue')
+    response = client.delete('/api/queue')
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    with app.app_context():
+        query = MatchingQueue.query.all()
+        assert len(query) == 0
+
+    # case 2
+    response = client.delete('/api/queue')
+    with app.app_context():
+        query = MatchingQueue.query.all()
+        assert len(query) == 0

@@ -16,8 +16,7 @@ class AuthenticationApi(Resource):
         authResp = {
             'reason': ''
         }
-
-        print(data)
+        #print(data)
 
         if not data:
             authResp['reason'] = "Please provide your information."

@@ -6,7 +6,6 @@ from app.exceptions.BadRequestException import BadRequestException
 
 # Define parser and request args
 parser = reqparse.RequestParser()
-
 parser.add_argument('memberId', type=str, required=False, location='args')
 
 class SessionApi(Resource):

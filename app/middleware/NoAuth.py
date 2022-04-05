@@ -10,7 +10,6 @@ def getCookie():
     
     else:
         token = request.cookies.get('hhub-token')
-        print(token)
         if token == None:
             raise UnauthorizedException('You are not authorized to access this page!')
 
@@ -21,7 +20,6 @@ def getCookie():
             return make_response(jsonify(authResp), 401) 
             
         data = jwt.decode(token, secret)
-        print(data)
         memberId = data['memberId']
         if memberId == None or len(memberId) < 36:
             raise UnauthorizedException('no memberId cookie found')

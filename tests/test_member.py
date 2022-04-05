@@ -22,13 +22,11 @@ def testGetMemberById(client, app, auth):
         token = generateToken(authMember.memberId)
         client.set_cookie(app, 'hhub-token', str(token))
 
-    #case 1
+    # case 1
     res = client.get('/api/members/28cf2179-74ed-0000-0000-3c09bd904365')
-    print(res.data)
-    print(res.status_code)
     assert res.data == b'null\n'
 
-    #case 2
+    # case 2
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     res = client.get('/api/members/28cf2179-74ed-4fab-a14c-3c09bd904365')
     assert res is not None

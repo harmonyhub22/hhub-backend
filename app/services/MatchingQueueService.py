@@ -36,8 +36,11 @@ def joinOrAttemptMatch(memberId):
     if liveSession != None:
         raise BadRequestException('you are currently in a session')
     
+    # if user is already in the queue, return existing record
     existing_record = getByMemberId(memberId)
-    
+    if existing_record != None:
+        return existing_record
+
     # if theres 1 person currently in the queue, match with them
     if len(getTop2()) == 1:
         session = match(memberId)
@@ -51,8 +54,6 @@ def joinOrAttemptMatch(memberId):
     
     # otherwise, get added to the queue
     else:
-        if existing_record != None:
-            return existing_record
         try:
             record = MatchingQueue(memberId)
             db.session.add(record)
