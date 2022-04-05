@@ -34,7 +34,7 @@ def testGetSession(app, client, auth):
     existingSessionId = None
     with app.app_context():
         response = client.post('/api/queue')
-        existingSessionId = Session.query.all()[0].sessionId
+        existingSessionId = Session.query.first().sessionId
 
     # case 1
     response = client.get('api/session/28cf2179-0000-0000-a14c-3c09bd904365')

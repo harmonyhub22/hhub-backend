@@ -10,10 +10,16 @@ from  werkzeug.security import generate_password_hash, check_password_hash
 from app.services.MemberService import getAll as getAllMembers
 from app.services.MatchingQueueService import getAll as getAllQueue
 from app.services.SessionService import getAll as getAllSessions
+from app.services.LayerService import getAll as getAllLayers
 from app.db.models.Auth import Auth
 
 def seedTest():
     s = db.session()
+
+    layers = getAllLayers()
+    for l in layers:
+        s.delete(l)
+    s.commit()
 
     queues = getAllQueue()
     for q in queues:
