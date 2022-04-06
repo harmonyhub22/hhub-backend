@@ -14,7 +14,7 @@ from app.api.CommonApi import CommonApi
 from app.api.SongApi import SongApi
 from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
-from app.middleware.NoAuth import getCookie
+from app.middleware.Auth import getCookie
 from app.socket.init import sio
 from app.controller.layerUpload import layerUploadBlueprint
 
