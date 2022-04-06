@@ -19,6 +19,9 @@ def getByEmail(email):
 def getAll():
     return Member.query.all()
 
+def getBySid(sid):
+    return Member.query.filter(Member.sid==sid)
+
 def addMember(email, firstname, lastname):
     try:
         member = Member(email, firstname, lastname, isOnline=True)
@@ -36,7 +39,6 @@ def editMember(id, data):
         member = getById(id)
         member.firstname = firstname
         member.lastname = lastname
-        member.isOnline = True
         db.session.commit()
         return member
     except Exception:
@@ -53,6 +55,16 @@ def deleteMember(memberId):
         db.session.rollback()
         raise ServerErrorException('could not delete member')
 
+def setOnline(memberId):
+    member = getById(memberId)
+    member.isOnline = True
+    db.session.commit()
+
+def setOffline(memberId):
+    member = getById(memberId)
+    member.isOnline = False
+    db.session.commit()
+
 # web socket utils
 def getSid(memberId):
     return getById(memberId).sid
@@ -61,6 +73,7 @@ def setSid(memberId, sid):
     try:
         member = getById(memberId)
         member.sid = sid
+        member.isOnline = True
         db.session.commit()
         return member.sid
     except Exception:
@@ -71,6 +84,8 @@ def updateSid(memberId, sid=None):
     try:
         member = getById(memberId)
         member.sid = sid
+        if sid == None:
+            member.isOnline = False
         db.session.commit()
         return member.sid
     except Exception:
