@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_socketio import SocketIO, leave_room, join_room, rooms
 from flask_socketio import emit
-from app.services.MemberService import getMemberIdFromSid, getSid, setSid, updateSid
+from app.services.MemberService import getMemberIdFromSid, getSid, setSid, updateSid, setOnline, setOffline, getBySid
 from app.services.SessionService import getById as getSessionById
 from app.services.LayerService import getById as getLayerById
 
@@ -22,16 +22,22 @@ def emitMessageToRoom(event, data, roomName, includeSelf=True):
 def destroyRoom(roomName):
     sio.close_room(room=roomName)
 
-def disconnectMember(memberId):
-    sid = updateSid(memberId, None)
-    if sid != None:
-        disconnect(sid)
+def disconnectMember(sid):
+    if sid == None:
+        print('cant disconnect')
+    else:
+        member = getBySid(sid)
+        if member is None:
+            print('cant find member with the given sid')
+        else:
+            memberId = member.memberId
+            updateSid(memberId, None)
 
 @sio.on('connect')
 def connect():
-    sid = request.sid      
+    sid = request.sid
     memberId = request.args['memberId']
-    if memberId == None: # not member is logged in
+    if memberId == None:
         raise ConnectionRefusedError('unauthorized!')
     if getSid(memberId) != None and sid != getSid(memberId):
         disconnectMember(memberId)
