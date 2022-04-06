@@ -24,22 +24,24 @@ def testSignup(client):
                            data=json.dumps({'email': 'a', 'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
                            headers={"Content-Type": "application/json"})
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    print("DEBUG", len(jsonResponse))
-    assert 1 == 2
+    assert jsonResponse['succcess'] == True
     
-# @pytest.mark.parametrize(('email', 'firstname', 'lastname', 'password', 'message'), (
-#     ('', '', '', '', b'email is required.'),
-#     ('a', '', 'a', 'a', b'firstname is required.'),
-#     ('a', 'a', '', 'a', b'lastname is required.'),
-#     ('a', 'a', 'a', '', b'password is required.'),
-#     ('a', 'a', 'a', 'a', b'account is already registered'),
-# ))
-# def test_register_validate_input(client, email, firstname, lastname, password, message):
-#     response = client.post(
-#         '/api/signup',
-#         data={'email': email,  'firstname': firstname, 'lastname': lastname, 'password': password}
-#     )
-#     assert message in response.data
+@pytest.mark.parametrize(('email', 'firstname', 'lastname', 'password', 'message'), (
+    ('', '', '', '', b'email is required.'),
+    ('a', '', 'a', 'a', b'firstname is required.'),
+    ('a', 'a', '', 'a', b'lastname is required.'),
+    ('a', 'a', 'a', '', b'password is required.'),
+    ('a', 'a', 'a', 'a', b'account is already registered'),
+))
+def testSignupValidateInput(client, email, firstname, lastname, password, message):
+    response = client.post(
+        '/api/signup',
+        data=json.dump({'email': email,  'firstname': firstname, 'lastname': lastname, 'password': password}),
+        headers={"Content-Type": "application/json"})
+    print("RESPONSE", response)
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    print("DEBUG", jsonResponse)
+    assert message in response.data
 '''
 Route: api/login
 REST operation: PUT
