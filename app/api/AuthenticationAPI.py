@@ -95,7 +95,7 @@ class AuthenticationApi(Resource):
                 authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
                 return make_response(jsonify(authResp), 401)
             
-            authResp = make_response(jsonify({'succcess' : True}))
+            authResp = make_response(jsonify({'success' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
 
