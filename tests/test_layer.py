@@ -1,17 +1,21 @@
 import json
 import uuid
 import pytest
+from urllib3 import encode_multipart_formdata
 from app.db.db import db
 from app.db.models.Layer import Layer
 from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
-from app.services.LayerService import addOrEditLayer
+from app.services.LayerService import addOrEditLayer, uploadFile
+from requests_toolbelt import MultipartEncoder
+from werkzeug.utils import secure_filename
 
 # one function to test all layer routes and services
 def testGetLayerById(app, client, auth):
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
+    badId = uuid.UUID('28cf2179-0000-0000-0000-3c09bd904365')
     
     auth.login()
     with app.app_context():
@@ -53,16 +57,26 @@ def testGetLayerById(app, client, auth):
     CRUD operation: PUT
     Service method tested: uploadFile()
     Cases to test:
-    1. file is not provided (catch BadRequestException)
-
+    1. session is non-existent (catch BadRequestException)
+    2. member ID is invalid (catch BadRequestException)
+    3. layer doesnt exist (catch BadRequestException)
+    4. normal case: layer file is provided, for a new layer
 
     Route e: api/session/<sessionID>/layers/<layerID>
     CRUD operation: DELETE
     Service method tested: deleteLayer()
+    Cases to test:
+    1. 
 
     Route f: api/session/<sessionID>/layers/<layerID>/delete
     CRUD operation: DELETE
     Service method tested: deleteFile()
+    Cases to test:
+    1. session is non-existent (catch BadRequestException)
+    2. member ID is invalid (catch BadRequestException)
+    3. invalid layer ID (catch BadRequestException)
+    4. trying to delete a staged layer (no URL exists) (catch BadRequestException)
+    5. normal case: delete a layer with a set bucket URL. check that URL is null
     '''
 
     # case a1
@@ -71,7 +85,7 @@ def testGetLayerById(app, client, auth):
     assert jsonResponse == []
 
     # case b1
-    response = client.get('/api/session/' + sessionId + '/layers/28cf2179-0000-0000-0000-3c09bd904365')
+    response = client.get('/api/session/' + sessionId + '/layers/' + str(badId))
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert jsonResponse == None
 
@@ -110,7 +124,7 @@ def testGetLayerById(app, client, auth):
 
     # case c2
     response = client.post(
-        '/api/session/28cf2179-0000-0000-0000-3c09bd904365/layers',
+        '/api/session/' + str(badId) + '/layers',
         data=json.dumps(newLayer),
         headers={"Content-Type": "application/json"}
     )
@@ -152,18 +166,57 @@ def testGetLayerById(app, client, auth):
     assert jsonResponse['y'] == 3.5
 
     # case b1
-    response = client.get('api/session/' + sessionId + '/layers/28cf2179-0000-0000-0000-3c09bd904365')
+    response = client.get('api/session/' + sessionId + '/layers/' + str(badId))
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert jsonResponse == None
 
+    m = MultipartEncoder(fields={'file': ('file', open('tests/sample.mp3', 'rb'), 'audio/mpeg')})
+
     # case d1
     response = client.put(
-        '/api/session/' + sessionId + '/layers/' + layerId + '/upload',
-        #files={'file': open('tests/sample.mp3', 'rb')},
-        data=open('tests/sample.mp3'),
-        #data=json.dumps({}),
-        headers={"Content-Type": "audio/mpeg"}
+        '/api/session/' + str(badId) +'/layers/' + layerId + '/upload',
+        data=m,
+        headers={"Content-Type": m.content_type}
     )
     assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "file not provided" in jsonResponse['message']
+    assert "cannot edit this layer" in jsonResponse['message']
+
+    # case d2
+    with app.app_context():
+        filename = secure_filename('file')
+        layerFile = ('file', open('tests/sample.mp3', 'rb'))
+        try:
+            uploadFile(sessionId, layerId, badId, layerFile, filename, m.content_type)
+            assert False
+        except BadRequestException as exc:
+            assert True
+
+    # case d3
+    m = MultipartEncoder(fields={'file': ('file', open('tests/sample.mp3', 'rb'), 'audio/mpeg')})
+    response = client.put(
+        '/api/session/' + sessionId + '/layers/' + str(badId) + '/upload',
+        data=m,
+        headers={"Content-Type": m.content_type}
+    )
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "layer with this id does not exist" in jsonResponse['message']
+
+    # case d4
+    m = MultipartEncoder(fields={'file': ('file', open('tests/sample.mp3', 'rb'), 'audio/mpeg')})
+    response = client.put(
+        '/api/session/' + sessionId + '/layers/' + layerId + '/upload',   # layer ID from case b2
+        data=m,
+        headers={"Content-Type": m.content_type}
+    )
+    assert response.status_code == 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert jsonResponse['bucketUrl'] != None
+    url = jsonResponse['bucketUrl']
+
+    # case e1
+    # case e2
+    # case e3
+    # case e4
+    # case e5

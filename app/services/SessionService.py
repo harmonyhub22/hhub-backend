@@ -6,6 +6,7 @@ from app.services.MemberService import getById as getMemberById
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from sqlalchemy.sql import func
+from app.bucket.bucket import deleteAllSongFiles
 
 def getById(id):
     return Session.query.get(id)
@@ -61,3 +62,7 @@ def endSession(memberId, sessionId):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('cannot end Session')
+
+def deleteAllFiles():
+    sessions = getAll()
+    deleteAllSongFiles(sessions)
