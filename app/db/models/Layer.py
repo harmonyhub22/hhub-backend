@@ -52,7 +52,6 @@ class Layer(db.Model):
         self.fadeInDuration = fadeInDuration
         self.fadeOutDuration = fadeOutDuration
         self.isReversed = isReversed
-        self.trimmedStartDuration = trimmedStartDuration
         self.trimmedEndDuration = trimmedEndDuration
         self.bucketUrl = bucketUrl
         self.fileName = fileName
