@@ -36,7 +36,7 @@ def testSignup(client):
 def testSignupValidateInput(client, email, firstname, lastname, password, message):
     response = client.post(
         '/api/signup',
-        data=json.dump({'email': email,  'firstname': firstname, 'lastname': lastname, 'password': password}),
+        data=json.dumps({'email': email,  'firstname': firstname, 'lastname': lastname, 'password': password}),
         headers={"Content-Type": "application/json"})
     print("RESPONSE", response)
     jsonResponse = json.loads(response.data.decode('utf-8'))
