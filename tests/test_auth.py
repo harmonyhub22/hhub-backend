@@ -22,8 +22,10 @@ def testSignup(client):
     # check for the correct route
     response = client.post('/api/signup', 
                            data=json.dumps({'email': 'a', 'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
-                           headers={Content-})
+                           headers={"Content-Type": "application/json"})
     jsonResponse = json.loads(response.data.decode('utf-8'))
+    print("DEBUG", len(jsonResponse))
+    assert 1 == 2
     
 # @pytest.mark.parametrize(('email', 'firstname', 'lastname', 'password', 'message'), (
 #     ('', '', '', '', b'email is required.'),
