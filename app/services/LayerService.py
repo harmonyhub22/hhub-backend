@@ -34,8 +34,9 @@ def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
     return layer
 
 def addOrEditLayer(sessionId, memberId, data, layerId=None):
-    print("here")
     session = getSessionById(sessionId)
+    if session is None:
+        raise BadRequestException('session not found')
     if session.member1Id != memberId and session.member2Id != memberId:
         raise BadRequestException('you are not part of this session') # they aren't part of the session
 
@@ -54,7 +55,6 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
             record = Layer(sessionId, memberId, name, startTime, duration, fadeInDuration,
                 fadeOutDuration, isReversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
             db.session.add(record)
-            print("DEBUG: added")
             db.session.commit()
             return record
         except Exception:
