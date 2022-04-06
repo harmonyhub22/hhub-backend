@@ -29,7 +29,7 @@ class AuthenticationApi(Resource):
             authResp['reason'] = "Please provide a password."
             return make_response(jsonify(authResp), 400)
             
-        member = getMemberByEmail('gcpetri@tamu.edu')
+        member = getMemberByEmail(data.get('email'))
 
         if not member:
             authResp['reason'] = "Account does not exist. Please create an account first!"
