@@ -7,7 +7,7 @@ from app.services.SongService import *
 parser = reqparse.RequestParser()
 parser.add_argument('sessionId', type=str, required=False, location='args')
 parser.add_argument('name', type=str, required=False, location='args')
-
+parser.add_argument('memberId',type=str,required=False,location ='args')
 class SongApi(Resource):
     
     def get(self, id=None):
@@ -21,6 +21,9 @@ class SongApi(Resource):
         name = args['name']
         if name != None:
             return jsonify(getByName(name))
+        memberId = args['memberId']
+        if memberId != None:
+            return jsonify(getAllByUser(memberId))
         return jsonify(getAll())
 
     def delete(self, id):

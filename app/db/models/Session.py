@@ -30,13 +30,13 @@ class Session(db.Model):
     endTime = db.Column('end_time', db.DateTime)
     member1 = db.relationship('Member', uselist=False, foreign_keys=[member1Id])
     member2 = db.relationship('Member', uselist=False, foreign_keys=[member2Id])
-    bucketUrl = db.Column('bucket_url', db.String(520), nullable=True, default=str('https://' + os.getenv('S3_BUCKET_NAME') + '.s3.us-east-2.amazonaws.com/'))
+    bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
     layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
-    bucketUrl = db.Column('bucket_url', db.String(520), nullable=False)
 
     def __init__(self, member1Id, member2Id):
         self.member1Id = member1Id
         self.member2Id = member2Id
+        
 
     def __repr__(self):
         return '<session %s>' % str(self.sessionId)
