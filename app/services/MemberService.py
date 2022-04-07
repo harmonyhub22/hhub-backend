@@ -92,5 +92,5 @@ def updateSid(memberId, sid=None):
         db.session.rollback()
         raise ServerErrorException('could not add sid to member')
 
-def getMemberIdFromSid(sid):
-    return Member.query.filter(Member.sid==sid).first().memberId
+def getMemberFromSid(sid):
+    return Member.query.filter(Member.sid==sid).first()

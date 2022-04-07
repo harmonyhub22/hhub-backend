@@ -23,6 +23,7 @@ class SongApi(Resource):
             return jsonify(getByName(name))
         memberId = args['memberId']
         if memberId != None:
+            memberId = uuid.UUID(memberId)
             return jsonify(getAllByUser(memberId))
         return jsonify(getAll())
 

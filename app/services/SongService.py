@@ -20,7 +20,7 @@ def getAll():
     return Song.query.all()
     
 def getAllByUser(memberId):
-    return Session.query.join(Song, Session.sessionId == Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt)
+    return Session.query.join(Song, Session.sessionId==Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt).all()
 
 def deleteSong(songId, memberId):
     song = Song.query.get(songId)

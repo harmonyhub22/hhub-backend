@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_socketio import SocketIO, leave_room, join_room, rooms
 from flask_socketio import emit
-from app.services.MemberService import getMemberIdFromSid, getSid, setSid, updateSid, setOnline, setOffline, getBySid
+from app.services.MemberService import getMemberFromSid, getSid, setSid, updateSid, setOnline, setOffline, getBySid
 from app.services.SessionService import getById as getSessionById
 from app.services.LayerService import getById as getLayerById
 
@@ -34,13 +34,10 @@ def disconnectMember(memberId):
 @sio.on('connect')
 def connect():
     sid = request.sid
-    # memberId = json['memberId']
     memberId = request.args['memberId']
     if memberId == None:
         raise ConnectionRefusedError('unauthorized!')
     member = getSid(memberId)
-    if member == None:
-        raise ConnectionRefusedError('no member found!')
     if member != None and sid != getSid(memberId):
         disconnectMember(memberId)
     setSid(memberId, sid)
@@ -54,66 +51,79 @@ def message(json):
 def joinRoom(json):
     print('received json: ' + str(json))
     sid = request.sid
-    memberId = getMemberIdFromSid(sid)
+    member = getMemberFromSid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
+        print('no session id sent')
+        return
+    if member == None:
+        print('no member sound')
         return
     musicSession = getSessionById(sessionId)
-    if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
+    if member != None and musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         addToRoom(sid, getRoomName(sessionId))
         emitMessageToRoom('message', 'sup to room', getRoomName(sessionId))
 
 @sio.on('pull_layer')
 def pull_layer(json):
     sid = request.sid
-    memberId = getMemberIdFromSid(sid)
+    member = getMemberFromSid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
+    if member == None:
+        return
     musicSession = getSessionById(sessionId)
-    if (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
+    if (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         emitMessageToRoom('pull_layer', {}, getRoomName(sessionId), includeSelf=False)
 
 @sio.on('session_vote_end')
 def sessionVoteEnd(json):
     sid = request.sid
-    memberId = getMemberIdFromSid(sid)
+    member = getMemberFromSid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
+    if member == None:
+        return
     musicSession = getSessionById(sessionId)
-    if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
+    if musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         emitMessageToRoom('session_vote_end', "end_session", getRoomName(sessionId), True)
 
 @sio.on('session_unvote_end')
 def sessionUnVoteEnd(json):
     sid = request.sid
-    memberId = getMemberIdFromSid(sid)
+    member = getMemberFromSid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
+    if member == None:
+        return
     musicSession = getSessionById(sessionId)
-    if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
+    if musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         emitMessageToRoom('session_unvote_end', "unend_session", getRoomName(sessionId), True)
 
 @sio.on('session_room_message')
 def sessionRoomMessage(json):
     sid = request.sid
-    memberId = getMemberIdFromSid(sid)
+    print(sid)
+    member = getMemberFromSid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
+    if member == None:
+        return
     musicSession = getSessionById(sessionId)
     name = ''
-    if musicSession.member1.memberId == memberId:
+    if musicSession.member1.memberId == member.memberId:
         name = str(musicSession.member1.firstname + ' ' + musicSession.member1.lastname)
-    elif musicSession.member2.memberId == memberId:
+    elif musicSession.member2.memberId == member.memberId:
         name = str(musicSession.member2.firstname + ' ' + musicSession.member2.lastname)
     data = dict()
     print(json)
     data['name'] = name
     data['message'] = json['message']
-    if memberId != None and musicSession != None and (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
+    if musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         emitMessageToRoom('session_room_message', data, getRoomName(sessionId), True)
 
 @sio.on('disconnect')
