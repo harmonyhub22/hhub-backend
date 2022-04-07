@@ -6,7 +6,6 @@ from xmlrpc.client import DateTime
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
 from app.db.models.Layer import Layer
 from app.db.models.Member import Member
 
@@ -36,6 +35,7 @@ class Session(db.Model):
     def __init__(self, member1Id, member2Id):
         self.member1Id = member1Id
         self.member2Id = member2Id
+        
 
     def __repr__(self):
         return '<session %s>' % str(self.sessionId)

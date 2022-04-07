@@ -5,8 +5,10 @@ from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import updateSid
 from app.services.MemberService import getById as getMemberById
+from app.bucket.bucket import uploadBucketFile
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
+from app.bucket.bucket import deleteAllSongFiles
 
 def getById(id):
     return Session.query.get(id)
@@ -27,22 +29,19 @@ def createSession(member1Id, member2Id):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     if not member2 or not member1:
-        print('member does not exist')
         raise BadRequestException('member does not exist')
     if member2Id == member1Id:
-        print('cannot start a session with yourself')
         raise BadRequestException('cannot start session with yourself')
 
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
-        print('Someone is already in a session')
         raise BadRequestException('you or other member is already in a Session')
 
     try:
         record = Session(member1Id, member2Id)
-        db.session.add(record)
-        db.session.commit()
+        # db.session.add(record)
+        # db.session.commit()
         return record
     except Exception:
         db.session.rollback()
@@ -75,3 +74,18 @@ def endSession(memberId, sessionId):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('cannot end Session')
+
+def deleteAllFiles():
+    sessions = getAll()
+    deleteAllSongFiles(sessions)
+
+def uploadSong(sessionId, songFile, fileName, contentType):
+    session = getById(sessionId)
+    if session == None:
+        raise BadRequestException('session has ended, cannot save song')
+
+    url = uploadBucketFile(songFile, fileName, contentType)
+    session.bucketUrl = url
+    db.session.commit()
+
+    return session

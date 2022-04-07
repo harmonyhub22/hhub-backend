@@ -6,38 +6,35 @@ from app.exceptions.BadRequestException import BadRequestException
 
 # Define parser and request args
 parser = reqparse.RequestParser()
-
 parser.add_argument('memberId', type=str, required=False, location='args')
 
 class SessionApi(Resource):
 
-    def get(self, id=None): # get all the member's sessions
+    def get(self, id=None):
         memberId = request.headers['MEMBERID']
+        if not memberId:
+            raise BadRequestException('no member ID')
+
+        # get all sessions with the given member ID
         memberSessions = getAllByMemberId(memberId)
-        if id != None:
-            for i in memberSessions:
-                print(i.sessionId)
-                if i.sessionId == uuid.UUID(id):
-                    return jsonify(i)
-            raise BadRequestException('no session with this id')
-        args = parser.parse_args()
-        member2Id = args['memberId']
-        if member2Id != None:
-            member2Id = uuid.UUID(member2Id)
-            for i in memberSessions:
-                if i.member1Id == member2Id or i.member2Id == member2Id:
-                    return jsonify(i)
-            raise BadRequestException('no session with this member')
-        return jsonify(memberSessions)
+        if not memberSessions:
+            raise BadRequestException('member has not joined any sessions')
+        if id == None:
+            return jsonify(memberSessions)
+
+        # get the session with the given member ID and session ID
+        else:
+            for s in memberSessions:
+                if s.sessionId == uuid.UUID(id):
+                    return jsonify(s)
+            raise BadRequestException('no session exists with this session ID and member ID')
 
 class SessionEndApi(Resource):
-
     def post(self, id):
         memberId = request.headers['MEMBERID']
         return jsonify(endSession(memberId, id))
 
 class SessionLiveApi(Resource):
-
     def get(self):
         memberId = request.headers['MEMBERID']
         return jsonify(getLiveSession(memberId))

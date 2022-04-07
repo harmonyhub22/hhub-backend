@@ -27,6 +27,8 @@ def match(member1Id): # if there are 2 users in the queue, create the session wi
     db.session.delete(queueItem)
     db.session.commit()
     newSession = createSession(member1Id, queueItem.memberId)
+    db.session.add(newSession)
+    db.session.commit()
     return newSession
 
 def joinOrAttemptMatch(memberId):
@@ -34,25 +36,24 @@ def joinOrAttemptMatch(memberId):
     if liveSession != None:
         raise BadRequestException('you are currently in a session')
     
+    # if user is already in the queue, return existing record
     existing_record = getByMemberId(memberId)
-    
+    if existing_record != None:
+        return existing_record
+
     # if theres 1 person currently in the queue, match with them
-    print("DEBUG:", str(len(getTop2())))
     if len(getTop2()) == 1:
-        print('only 1 in queue, proceeding to match')
         session = match(memberId)
-        sid1 = getSid(session.member1.memberId)
-        sid2 = getSid(session.member2.memberId)
-        addToRoom(sid1, 'session-'+str(session.sessionId))
-        addToRoom(sid2, 'session-'+str(session.sessionId))
-        emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
+        # TODO: uncomment lines 45-49 this after running unit tests
+        # sid1 = getSid(session.member1.memberId)
+        # sid2 = getSid(session.member2.memberId)
+        # addToRoom(sid1, 'session-'+str(session.sessionId))
+        # addToRoom(sid2, 'session-'+str(session.sessionId))
+        # emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
         return None
     
     # otherwise, get added to the queue
     else:
-        print('adding to queue')
-        if existing_record != None:
-            return existing_record
         try:
             record = MatchingQueue(memberId)
             db.session.add(record)

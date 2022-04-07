@@ -1,7 +1,7 @@
 import os
 import time
 import boto3
-
+from flask import session
 
 AWS_ACCESS_KEY = os.getenv('S3_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('S3_SECRET_KEY')
@@ -17,19 +17,36 @@ def getBotoClient():
 
 def uploadBucketFile(file, filename, contentType):
     client = getBotoClient()
-    print('got client')
     filename = generateFileName(filename)
 
-    client.put_object(Body=file,
-                    Bucket=AWS_BUCKET_NAME,
-                    Key=filename,
-                    ContentType=contentType)
+    client.put_object(
+        Body=file,
+        Bucket=AWS_BUCKET_NAME,
+        Key=filename,
+        ContentType=contentType
+    )
     
     return AWS_BUCKET_URL + filename
 
 def deleteBucketFile(url):
     client = getBotoClient()
     filename = url[url.rfind('/') + 1:]
-    client.delete_object(Bucket=AWS_BUCKET_NAME,
-                        Key=filename)
+    client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
 
+# helper functions to clear the bucket when developing/testing
+def deleteAllLayerFiles(layers):
+    client = getBotoClient()
+    for layer in layers:
+        url = layer.bucketUrl
+        if layer.bucketUrl:
+            filename = url[url.rfind('/') + 1:]
+            client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
+            deleteBucketFile(layer.bucketUrl)
+
+def deleteAllSongFiles(sessions):
+    client = getBotoClient()
+    for song in sessions:
+        url = song.bucketUrl
+        if song.bucketUrl:
+            filename = url[url.rfind('/') + 1:]
+            client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)

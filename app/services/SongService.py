@@ -1,8 +1,11 @@
 from app.db.models.Song import Song
+from app.db.models.Session import Session
 from sqlalchemy import func
 from app.db.db import db
+from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.exceptions.UnauthorizedException import UnauthorizedException
+from app.services.SessionService import getById as getSessionById
 
 def getById(id):
     return Song.query.get(id)
@@ -15,13 +18,9 @@ def getBySessionId(sessionId):
 
 def getAll():
     return Song.query.all()
-
-def createSong(sessionId, memberId):
-    # TODO
-    # somehow loop through all layers merging them
-    # upload to bucket
-    # return song record
-    pass
+    
+def getAllByUser(memberId):
+    return Session.query.join(Song, Session.sessionId == Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt)
 
 def deleteSong(songId, memberId):
     song = Song.query.get(songId)

@@ -1,3 +1,4 @@
+from curses import A_ALTCHARSET
 import uuid
 from flask import jsonify, request
 from flask_restful import Resource
@@ -14,9 +15,8 @@ class LayerApi(Resource):
         data = request.get_json(force=True)
         memberId = request.headers['MEMBERID']
         memberId = uuid.UUID(memberId)
-        print(memberId)
         return jsonify(addOrEditLayer(sessionId, memberId, data, id))
-
+            
     def delete(self, sessionId, id):
         memberId = request.headers['MEMBERID']
         memberId = uuid.UUID(memberId)
