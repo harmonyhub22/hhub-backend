@@ -22,24 +22,26 @@ def emitMessageToRoom(event, data, roomName, includeSelf=True):
 def destroyRoom(roomName):
     sio.close_room(room=roomName)
 
-def disconnectMember(sid):
-    if sid == None:
+def destroyRoomById(sessionId):
+    destroyRoom(getRoomName(sessionId))
+
+def disconnectMember(memberId):
+    if memberId == None:
         print('cant disconnect')
     else:
-        member = getBySid(sid)
-        if member is None:
-            print('cant find member with the given sid')
-        else:
-            memberId = member.memberId
-            updateSid(memberId, None)
+        updateSid(memberId, None)
 
 @sio.on('connect')
 def connect():
     sid = request.sid
+    # memberId = json['memberId']
     memberId = request.args['memberId']
     if memberId == None:
         raise ConnectionRefusedError('unauthorized!')
-    if getSid(memberId) != None and sid != getSid(memberId):
+    member = getSid(memberId)
+    if member == None:
+        raise ConnectionRefusedError('no member found!')
+    if member != None and sid != getSid(memberId):
         disconnectMember(memberId)
     setSid(memberId, sid)
 
@@ -71,10 +73,6 @@ def pull_layer(json):
     musicSession = getSessionById(sessionId)
     if (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
         emitMessageToRoom('pull_layer', {}, getRoomName(sessionId), includeSelf=False)
-
-@sio.on('finished')
-def finishSong(json):
-    print('received json: ' + str(json))
 
 @sio.on('session_vote_end')
 def sessionVoteEnd(json):

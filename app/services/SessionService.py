@@ -1,7 +1,9 @@
 import datetime
 import uuid
+from app.bucket.bucket import deleteBucketFile
 from app.db.models.Session import Session
 from app.db.db import db
+from app.services.MemberService import updateSid
 from app.services.MemberService import getById as getMemberById
 from app.bucket.bucket import uploadBucketFile
 from app.exceptions.BadRequestException import BadRequestException
@@ -48,10 +50,23 @@ def createSession(member1Id, member2Id):
 def endSession(memberId, sessionId):
     session = Session.query.get(sessionId)
     memberId = uuid.UUID(memberId)
-    if session == None:
-        raise BadRequestException('session does not exist')
-    if session.member1Id != memberId and session.member2Id != memberId:
-        raise BadRequestException('you are not in this session')
+    if session == None or (session.member1Id != memberId and session.member2Id != memberId):
+        raise BadRequestException('you cannot modify this Session')
+    for layer in session.layers:
+        if layer.bucketUrl != None:
+            try:
+                deleteBucketFile(layer.bucketUrl)
+            except Exception:
+                pass
+        try:
+            db.session.delete(layer)
+            db.session.commit()
+        except Exception:
+            pass
+    try:
+        updateSid(memberId, None)
+    except Exception:
+        pass
     try:
         session.endTime = datetime.datetime.utcnow()
         db.session.commit()
