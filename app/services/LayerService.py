@@ -18,7 +18,7 @@ def getAllBySessionId(sessionId):
 def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
-        raise BadRequestException('you cannot edit this layer')
+        raise BadRequestException('you cannot upload this file')
     layer = getById(layerId)
     if layer == None:
         raise BadRequestException('layer with this id does not exist')
@@ -81,10 +81,10 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
 def deleteFile(sessionId, layerId, memberId):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
-        raise BadRequestException('you cannot edit this layer')
+        raise BadRequestException('you cannot delete this file')
     layer = getById(layerId)
 
-    if layer is None or layer.bucketUrl == None:
+    if layer is None:
         raise BadRequestException('layer does not exist')
     if layer.bucketUrl == None:
         raise BadRequestException('layer has no url yet')
