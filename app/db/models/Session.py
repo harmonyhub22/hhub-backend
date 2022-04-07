@@ -33,10 +33,10 @@ class Session(db.Model):
     bucketUrl = db.Column('bucket_url', db.String(520), nullable=True)
     layers = db.relationship('Layer', backref='session', lazy='subquery', uselist=True, primaryjoin="Session.sessionId == Layer.sessionId")
 
-
     def __init__(self, member1Id, member2Id):
         self.member1Id = member1Id
         self.member2Id = member2Id
+        
 
     def __repr__(self):
         return '<session %s>' % str(self.sessionId)

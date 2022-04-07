@@ -5,5 +5,5 @@ class LogoutApi(Resource):
 
     def post(self):
         resp = make_response(jsonify({}), 200)
-        resp.delete_cookie('memberId')
+        resp.delete_cookie('hhub-token')
         return resp

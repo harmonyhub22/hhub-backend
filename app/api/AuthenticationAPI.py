@@ -28,15 +28,15 @@ class AuthenticationApi(Resource):
             authResp['reason'] = "Please provide a password."
             return make_response(jsonify(authResp), 400)
             
-        member = getMemberByEmail('gcpetri@tamu.edu')
+        member = getMemberByEmail(data.get('email'))
 
         if not member:
-            authResp['reason'] = "Account does not exist. Please create an account first!"
+            authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
             return make_response(jsonify(authResp), 400)
         
         authMember = getAuthByMemberId(member.memberId)
         if not authMember:
-            authResp['reason'] = "Account does not exist. Please create an account first!"
+            authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
             return make_response(jsonify(authResp), 400)
     
         if check_password_hash(authMember.password, data['password']):
@@ -46,7 +46,7 @@ class AuthenticationApi(Resource):
                 authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
                 return make_response(jsonify(authResp), 401)
 
-            authResp = make_response(jsonify({'succcess' : True}))
+            authResp = make_response(jsonify({'success' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
         else:
@@ -95,7 +95,7 @@ class AuthenticationApi(Resource):
                 authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
                 return make_response(jsonify(authResp), 401)
             
-            authResp = make_response(jsonify({'succcess' : True}))
+            authResp = make_response(jsonify({'success' : True, 'reason': 'Account is already registered.'}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
 
@@ -107,6 +107,6 @@ class AuthenticationApi(Resource):
                 authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
                 return make_response(jsonify(authResp), 401)
             
-            authResp = make_response(jsonify({'succcess' : True}))
+            authResp = make_response(jsonify({'success' : True, 'reason': 'Account is already registered.'}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp

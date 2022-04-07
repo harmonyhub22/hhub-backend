@@ -1,7 +1,12 @@
 import pytest
 from app.db.db import db
 from app.db.models.Song import Song
-
+import uuid
+from app.db.models.Layer import Layer
+from app.db.models.Session import Session
+from app.exceptions.BadRequestException import BadRequestException
+from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
+from app.services.LayerService import addOrEditLayer
 '''
 Route: api/songs/<songID>
 CRUD operation: DELETE
@@ -9,9 +14,24 @@ Service method tested: getById()
 Cases to test:
 1. getting a song which is not yet created, in which case queryset is empty
 2. for a song which is created, queryset should have 1 song. check metadata
+3. just checking link for some reason
 '''
 def testGetSongById(app, client, auth):
-    pass
+    auth.login()
+    # case 1
+    id = 'e165e9e0-6a54-4bd9-0000-0008d49f04d0'
+    with app.app_context():
+        res = Song.query.get(id)
+    assert res == None
+    #case 2
+    id = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
+    with app.app_context():
+        res = Song.query.get(id)
+    assert len(res) == 1 
+    #case 3
+    res = client.get('/api/songs/{}'.format(id))
+    assert res.data == b'null\n'
+    # pass
 
 '''
 Route: api/songs?name=<songName>
@@ -24,6 +44,7 @@ Cases to test:
 '''
 def testGetSongByName(app, client, auth):
     pass
+    
 
 '''
 Route: api/songs/<songID>

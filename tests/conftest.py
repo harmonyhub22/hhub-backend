@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import pytest
@@ -9,19 +10,22 @@ from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))
 sys.path.append(root_dir)
 from app.setup.setup import create_app
+from app.db.db import db
 
 class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, email='dean27@tamu.edu', password='password'):
-        return self._client.post(
+    def login(self, email='vitruong00@tamu.edu', password='password'):
+        return self._client.put(
             '/api/login',
-            data={'email': email, 'password': password}
+            data=json.dumps({'email': email, 'password': password}),
+            headers={"Content-Type": "application/json"}
         )
 
     def logout(self):
-        return self._client.get('/api/logout')
+        return self._client.post('/api/logout',
+                                headers={"Content-Type": "application/json"})
 
 # @pytest.fixture annotation tells pytest that the following function creates (using the yield command) 
 @pytest.fixture
