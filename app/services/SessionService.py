@@ -5,10 +5,8 @@ from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import updateSid
 from app.services.MemberService import getById as getMemberById
-from app.bucket.bucket import uploadBucketFile
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
-from app.bucket.bucket import deleteAllSongFiles
 
 def getById(id):
     return Session.query.get(id)
@@ -40,8 +38,6 @@ def createSession(member1Id, member2Id):
 
     try:
         record = Session(member1Id, member2Id)
-        # db.session.add(record)
-        # db.session.commit()
         return record
     except Exception:
         db.session.rollback()
@@ -74,18 +70,3 @@ def endSession(memberId, sessionId):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('cannot end Session')
-
-def deleteAllFiles():
-    sessions = getAll()
-    deleteAllSongFiles(sessions)
-
-def uploadSong(sessionId, songFile, fileName, contentType):
-    session = getById(sessionId)
-    if session == None:
-        raise BadRequestException('session has ended, cannot save song')
-
-    url = uploadBucketFile(songFile, fileName, contentType)
-    session.bucketUrl = url
-    db.session.commit()
-
-    return session

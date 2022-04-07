@@ -44,13 +44,15 @@ def joinOrAttemptMatch(memberId):
     # if theres 1 person currently in the queue, match with them
     if len(getTop2()) == 1:
         session = match(memberId)
-        # TODO: uncomment lines 45-49 this after running unit tests
-        # sid1 = getSid(session.member1.memberId)
-        # sid2 = getSid(session.member2.memberId)
-        # addToRoom(sid1, 'session-'+str(session.sessionId))
-        # addToRoom(sid2, 'session-'+str(session.sessionId))
-        # emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
-        return None
+        try:
+            sid1 = getSid(session.member1.memberId)
+            sid2 = getSid(session.member2.memberId)
+            addToRoom(sid1, 'session-'+str(session.sessionId))
+            addToRoom(sid2, 'session-'+str(session.sessionId))
+            emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
+            return None
+        except:
+            return None
     
     # otherwise, get added to the queue
     else:

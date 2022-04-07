@@ -19,34 +19,23 @@ class Song(db.Model):
 
     songId: uuid
     session: Session
+    member: Member
     name: str
     duration: int
     createdAt: DateTime
-    numLikes: int
 
     songId = db.Column('song_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)
+    memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     name = db.Column('name', db.String(30), nullable=False, default='My New Song')
     duration = db.Column('duration', db.Integer, default=60)
     createdAt = db.Column('created_at', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    numLikes = db.Column('num_likes', db.Integer, default=0)
     session = db.relationship('Session', uselist=False, foreign_keys=[sessionId])
+    member = db.relationship('Member', uselist=False, foreign_keys=[memberId])
 
-    '''
-    @hybrid_property
-    def numLikes(self):
-        return self.numLikesExpression(self)
-
-    @numLikes.expression
-    def numLikesExpression(cls):
-        return db.session.query(func.count('likes')).\
-            filter_by('likes.song_id'==cls.songId).\
-            label('numLikes')
-    '''
-
-
-    def __init__(self, sessionId, name, duration):
+    def __init__(self, sessionId, memberId, name, duration):
         self.sessionId = sessionId
+        self.memberId = memberId
         self.name = name
         self.duration = duration
 
@@ -56,8 +45,3 @@ class Song(db.Model):
     __mapper_args__ = {
         'polymorphic_identity':'song',
     }
-
-likes = db.Table('likes',
-    db.Column('song_id', UUID(as_uuid=True), db.ForeignKey(Song.songId), primary_key=True),
-    db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), primary_key=True)
-)

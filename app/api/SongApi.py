@@ -8,6 +8,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('sessionId', type=str, required=False, location='args')
 parser.add_argument('name', type=str, required=False, location='args')
 parser.add_argument('memberId',type=str,required=False,location ='args')
+
 class SongApi(Resource):
     
     def get(self, id=None):
@@ -26,6 +27,14 @@ class SongApi(Resource):
             memberId = uuid.UUID(memberId)
             return jsonify(getAllByUser(memberId))
         return jsonify(getAll())
+
+    def post(self, sessionId, id=None):
+        data = request.get_json(force=True)
+        memberId = request.headers['MEMBERID']
+        if not memberId:
+            raise BadRequestException('no member ID')
+        memberId = uuid.UUID(memberId)
+        return jsonify(addSong(sessionId, memberId, data))
 
     def delete(self, id):
         memberId = request.headers['MEMBERID']
