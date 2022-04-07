@@ -1,3 +1,4 @@
+from app.bucket.bucket import deleteBucketFile
 from app.db.models.Song import Song
 from app.db.models.Session import Session
 from sqlalchemy import func
@@ -22,10 +23,23 @@ def getAll():
 def getAllByUser(memberId):
     return Session.query.join(Song, Session.sessionId==Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt).all()
 
+def getAllBySessionId(sessionId):
+    return Song.query.filter(Song.sessionId==sessionId).all()
+
 def deleteSong(songId, memberId):
-    song = Song.query.get(songId)
+    song = getById(songId)
+    if song == None:
+        print('no song found')
+        raise ServerErrorException('no song found')
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
         raise UnauthorizedException('you cannot delete this song')
+    songs = getAllBySessionId(song.sessionId)
+    if songs != None and len(songs) == 1:
+        try:
+            if song.session.bucketUrl != None:
+                deleteBucketFile(song.session.bucketUrl)
+        except Exception:
+            raise ServerErrorException('could not delete song')
     try: 
         db.session.delete(song)
         db.session.commit()
