@@ -50,7 +50,6 @@ def create_app(test_config=None):
         if local:
             db.drop_all()
 
-        # cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'hhub') + ";"
         cmd = "CREATE SCHEMA IF NOT EXISTS " + os.getenv('SCHEMA', 'public') + ";"
         db.session.execute(cmd)
         cmd = "SET search_path TO " + os.getenv('SCHEMA', 'public') + ";"
