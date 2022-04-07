@@ -1,3 +1,4 @@
+from app.bucket.bucket import uploadBucketFile
 from app.db.models.Song import Song
 from app.db.models.Session import Session
 from sqlalchemy import func
@@ -6,6 +7,7 @@ from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.exceptions.UnauthorizedException import UnauthorizedException
 from app.services.SessionService import getById as getSessionById
+from app.bucket.bucket import deleteAllSongFiles
 
 def getById(id):
     return Song.query.get(id)
@@ -33,3 +35,32 @@ def deleteSong(songId, memberId):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('could not delete song')
+
+def addSong(sessionId, memberId, data):
+    if not data.get('name') or not data.get('duration'):
+        raise BadRequestException('song name or duration not provided')
+        
+    name, duration = data['name'], data['duration']
+    song = Song(sessionId, name, duration)    
+    try: 
+        db.session.add(song)
+        db.session.commit()
+        return song
+    except Exception:
+        db.session.rollback()
+        raise ServerErrorException('could not add song')
+
+def uploadSong(sessionId, songFile, fileName, contentType):
+    session = getById(sessionId)
+    if session == None:
+        raise BadRequestException('session does not exist')
+
+    url = uploadBucketFile(songFile, fileName, contentType)
+    session.bucketUrl = url
+    db.session.commit()
+
+    return session
+
+def deleteAllFiles():
+    songs = getAll()
+    deleteAllSongFiles(songs)

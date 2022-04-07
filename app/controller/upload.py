@@ -3,6 +3,7 @@ from flask import jsonify, request
 from app.exceptions.BadRequestException import BadRequestException
 from werkzeug.utils import secure_filename
 from app.services.LayerService import deleteFile, uploadFile
+from app.services.SongService import uploadSong
 from flask import Blueprint
 
 layerUploadBlueprint = Blueprint('layer_upload_blueprint', __name__, url_prefix='/api/session/<sessionId>/layers/<layerId>')
@@ -16,7 +17,6 @@ def postLayer(sessionId, layerId):
     layerFile = request.files['file']
     if not layerFile:
         raise BadRequestException('file not provided')
-    print(layerFile.filename)
 
     fileName = secure_filename(layerFile.filename)
     contentType = request.mimetype
@@ -30,13 +30,12 @@ def deleteLayer(sessionId, layerId):
 
     return jsonify(deleteFile(sessionId, layerId, memberId))
 
-@songUploadBlueprint.route('/upload', methods=['POST', 'PUT'])
-def uploadSong(sessionId):
+@songUploadBlueprint.route('/upload', methods=['PUT'])
+def putSong(sessionId):
 
     songFile = request.files['file']
     if not songFile:
         raise BadRequestException('file not provided')
-    print(songFile.filename)
 
     fileName = secure_filename(songFile.filename)
     contentType = request.mimetype

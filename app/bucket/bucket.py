@@ -43,10 +43,10 @@ def deleteAllLayerFiles(layers):
             client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
             deleteBucketFile(layer.bucketUrl)
 
-def deleteAllSongFiles(sessions):
+def deleteAllSongFiles(songs):
     client = getBotoClient()
-    for song in sessions:
-        url = song.bucketUrl
+    for song in songs:
+        url = song.session.bucketUrl
         if song.bucketUrl:
             filename = url[url.rfind('/') + 1:]
             client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
