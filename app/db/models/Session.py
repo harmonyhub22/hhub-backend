@@ -6,7 +6,6 @@ from xmlrpc.client import DateTime
 from app.db.db import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
 from app.db.models.Layer import Layer
 from app.db.models.Member import Member
 

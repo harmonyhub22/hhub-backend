@@ -1,3 +1,4 @@
+import os
 import uuid
 from app.db.db import db
 from app.db.models.Auth import Auth
@@ -41,9 +42,9 @@ def seed():
     s.commit()
 
     # matching queues
-    queue1 = MatchingQueue(member2.memberId)
-    queue1.matchingQueueId = '1c74a6fd-b7b9-4fe4-96fd-f7e78eb6d2c2'
-    s.add(queue1) # vi joins the queue
+    # queue1 = MatchingQueue(member2.memberId)
+    # queue1.matchingQueueId = '1c74a6fd-b7b9-4fe4-96fd-f7e78eb6d2c2'
+    # s.add(queue1) # vi joins the queue
     #s.add(MatchingQueue(member3.memberId)) # will joins the queue
 
     # sessions
@@ -62,7 +63,7 @@ def seed():
     #s.commit()
 
     # songs
-    # song1 = Song(session1.sessionId, 'Some song', 60, 'something.com', 120)
+    # song1 = Song(session1.sessionId, 'Some song', 60)
     # song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
     # s.add(song1)
 

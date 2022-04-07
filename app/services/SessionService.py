@@ -3,9 +3,9 @@ import uuid
 from app.db.models.Session import Session
 from app.db.db import db
 from app.services.MemberService import getById as getMemberById
+from app.bucket.bucket import uploadBucketFile
 from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
-from sqlalchemy.sql import func
 from app.bucket.bucket import deleteAllSongFiles
 
 def getById(id):
@@ -66,3 +66,14 @@ def endSession(memberId, sessionId):
 def deleteAllFiles():
     sessions = getAll()
     deleteAllSongFiles(sessions)
+
+def uploadSong(sessionId, songFile, fileName, contentType):
+    session = getById(sessionId)
+    if session == None:
+        raise BadRequestException('session has ended, cannot save song')
+
+    url = uploadBucketFile(songFile, fileName, contentType)
+    session.bucketUrl = url
+    db.session.commit()
+
+    return session

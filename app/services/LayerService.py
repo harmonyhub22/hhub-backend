@@ -15,7 +15,7 @@ def getAll():
 def getAllBySessionId(sessionId):
     return Layer.query.filter(Layer.sessionId==sessionId).all()
 
-def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
+def uploadFile(sessionId, layerId, memberId, layerFile, fileName, contentType):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
         raise BadRequestException('you cannot upload this file')
@@ -26,7 +26,7 @@ def uploadFile(sessionId, layerId, memberId, file, filename, contentType):
     if layer.bucketUrl != None:
         deleteBucketFile(layer.bucketUrl)
     
-    url = uploadBucketFile(file, filename, contentType)
+    url = uploadBucketFile(layerFile, fileName, contentType)
 
     layer.bucketUrl = url
     db.session.commit()

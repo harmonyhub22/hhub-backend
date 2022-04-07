@@ -2,8 +2,10 @@ from app.db.models.Song import Song
 from app.db.models.Session import Session
 from sqlalchemy import func
 from app.db.db import db
+from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.exceptions.UnauthorizedException import UnauthorizedException
+from app.services.SessionService import getById as getSessionById
 
 def getById(id):
     return Song.query.get(id)

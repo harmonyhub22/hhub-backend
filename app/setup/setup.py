@@ -16,16 +16,11 @@ from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.Auth import getCookie
 from app.socket.init import sio
-from app.controller.layerUpload import layerUploadBlueprint
+from app.controller.upload import layerUploadBlueprint
 
 def create_app(test_config=None):
-    """
-    Creating and returning the app
-    """
-
     app_path = os.path.dirname(os.path.abspath(__file__))
     project_folder = os.path.expanduser(app_path)
-    #load_dotenv(os.path.join(project_folder, '.env'))
 
     app = Flask(__name__)
 
@@ -65,7 +60,7 @@ def create_app(test_config=None):
             return send_from_directory(app.root_path,
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
     
-        ### CORS section
+        # CORS section
         @app.after_request
         def after_request_func(response):
             if request.method == 'OPTIONS':
@@ -77,7 +72,6 @@ def create_app(test_config=None):
             response.headers.add('Access-Control-Allow-Credentials', 'true')
             response.headers.add('Access-Control-Allow-Origin', os.getenv('CORS_ORIGIN'))
             return response
-        ### end CORS section
 
         @app.route('/')
         def home():
