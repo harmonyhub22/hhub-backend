@@ -1,5 +1,5 @@
 import uuid
-from app.bucket.bucket import deleteBucketFile, uploadBucketFile
+from app.bucket.bucket import deleteBucketFile, uploadBucketFile, deleteAllLayerFiles
 from app.db.models.Layer import Layer
 from app.db.db import db
 from app.services.SessionService import getById as getSessionById
@@ -84,8 +84,10 @@ def deleteFile(sessionId, layerId, memberId):
         raise BadRequestException('you cannot edit this layer')
     layer = getById(layerId)
 
+    if layer is None or layer.bucketUrl == None:
+        raise BadRequestException('layer does not exist')
     if layer.bucketUrl == None:
-        return layer
+        raise BadRequestException('layer has no url yet')
     
     deleteBucketFile(layer.bucketUrl)
     layer.bucketUrl = None
@@ -110,3 +112,6 @@ def deleteLayer(sessionId, memberId, layerId):
     except Exception:
         db.session.rollback()
 
+def deleteAllFiles():
+    layers = getAll()
+    deleteAllLayerFiles(layers)
