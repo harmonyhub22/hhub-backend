@@ -1,6 +1,5 @@
-from app.app import app
+import os
+from app.app import app, sio
 
-awesome_app = app
-
-if __name__ == '__main__':
-    awesome_app.run()
+if __name__ == "__main__":
+    sio.run(app)
