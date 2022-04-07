@@ -19,10 +19,13 @@ def getCookie():
         if secret == None:
             authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
             return make_response(jsonify(authResp), 401) 
-            
-        data = jwt.decode(token, secret)
-        print(data)
-        memberId = data['memberId']
-        if memberId == None or len(memberId) < 36:
-            raise UnauthorizedException('no memberId cookie found')
-        request.environ['HTTP_MEMBERID'] = memberId
+        
+        try:
+            data = jwt.decode(token, secret)
+            print(data)
+            memberId = data['memberId']
+            if memberId == None or len(memberId) < 36:
+                raise UnauthorizedException('no memberId cookie found')
+            request.environ['HTTP_MEMBERID'] = memberId
+        except:
+            raise UnauthorizedException('you login has expired')

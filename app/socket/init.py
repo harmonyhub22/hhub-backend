@@ -22,6 +22,9 @@ def emitMessageToRoom(event, data, roomName, includeSelf=True):
 def destroyRoom(roomName):
     sio.close_room(room=roomName)
 
+def destroyRoomById(sessionId):
+    destroyRoom(getRoomName(sessionId))
+
 def disconnectMember(memberId):
     if memberId == None:
         print('cant disconnect')
@@ -70,10 +73,6 @@ def pull_layer(json):
     musicSession = getSessionById(sessionId)
     if (musicSession.member1Id == memberId or musicSession.member2Id == memberId):
         emitMessageToRoom('pull_layer', {}, getRoomName(sessionId), includeSelf=False)
-
-@sio.on('finished')
-def finishSong(json):
-    print('received json: ' + str(json))
 
 @sio.on('session_vote_end')
 def sessionVoteEnd(json):
