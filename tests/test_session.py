@@ -16,10 +16,9 @@ Route: api/session
 REST operation: GET
 Service method tested: getAllByMemberId()
 Cases to test:
-1. giving a session ID where no existing session has that ID (catch BadRequestException - no session with this ID)
+1. invalid session ID (catch BadRequestException)
 2. normal case: valid session ID, member ID exists, queryset should have only 1 session. check metadata
 '''
-@pytest.mark.order(2)
 def testGetSession(app, client, auth):
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
     willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
@@ -40,7 +39,7 @@ def testGetSession(app, client, auth):
     response = client.get('api/session/28cf2179-0000-0000-a14c-3c09bd904365')
     assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "no session with this id" in jsonResponse['message']
+    assert "no session exists with this session ID" in jsonResponse['message']
 
     # case 2
     response = client.get('api/session/' + str(existingSessionId))

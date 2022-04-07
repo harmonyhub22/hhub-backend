@@ -21,9 +21,6 @@ def getAll():
     return Session.query.all()
 
 def getLiveSession(memberId):
-    # session = Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
-    # if session != None:
-    #     print(session.endTime)
     return Session.query.filter(((Session.member1Id==memberId) | (Session.member2Id==memberId)) & (Session.endTime==None)).first()
 
 def createSession(member1Id, member2Id):
