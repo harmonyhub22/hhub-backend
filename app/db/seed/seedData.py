@@ -17,8 +17,8 @@ def seed():
         return
 
     member1 = Member('gcpetri@tamu.edu', 'Greg', 'Petri')
-    member2 = Member('vitruong00@tamu.edu', 'Vi', 'Truong')
-    member3 = Member('will@tamu.edu', 'Will', 'Thomas')
+    member2 = Member('vitruong00@tamu.edu', 'Vi', 'Truong', True)
+    member3 = Member('will@tamu.edu', 'Will', 'Thomas', True)
     member4 = Member('dean27@tamu.edu', 'Dean', 'Something')
     member1.memberId = uuid.UUID('693d350f-9cd0-4812-83c4-f1a98a8100ff')
     member2.memberId = uuid.UUID('0dfedda5-ddd3-481f-90d9-6ee388c4093e')
@@ -51,7 +51,7 @@ def seed():
     # sessions
     session1 = Session(member1.memberId, member4.memberId) # greg and dean join a session
     session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
-    # session1.endTime = datetime.datetime.utcnow()
+    session1.endTime = datetime.datetime.utcnow()
     s.add(session1)
 
     s.commit()
