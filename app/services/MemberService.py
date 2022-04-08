@@ -36,12 +36,17 @@ def addMember(email, firstname, lastname):
         raise ServerErrorException('could not add member')
     
 def editMember(id, data):
+    email = data['email']
     firstname = data['firstname']
     lastname = data['lastname']
     try:
         member = getById(id)
-        member.firstname = firstname
-        member.lastname = lastname
+        if email != None:
+            member.email = email
+        if firstname != None:
+            member.firstname = firstname
+        if lastname != None:
+            member.lastname = lastname
         db.session.commit()
         return member
     except Exception:
