@@ -21,7 +21,6 @@ def getCookie():
         
         try:
             data = jwt.decode(token, secret)
-            print(data)
             memberId = data['memberId']
             if memberId == None or len(memberId) < 36:
                 raise UnauthorizedException('no memberId cookie found')

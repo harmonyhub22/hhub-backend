@@ -1,16 +1,17 @@
 import json
 import pytest
+from sqlalchemy import join
 from app.db.db import db
 import uuid
 from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
-from app.services.SessionService import getById as getByIdSession
-from app.services.SongService import getAll as getAllSongs
+from app.services.SessionService import getById as getByIdSession, getAll as getAllSessions, getByMemberId as getSessionByMemberId
+from app.services.SongService import addSong, getAll as getAllSongs, getBySessionId
 from requests_toolbelt import MultipartEncoder
 from werkzeug.utils import secure_filename
-
 from app.services.SongService import uploadSong
+from app.services.MatchingQueueService import joinOrAttemptMatch
 
 # one function to test all song routes and services
 def testSongAll(app, client, auth):
@@ -35,50 +36,47 @@ def testSongAll(app, client, auth):
     CRUD operation: POST
     Service method tested: addOrEditLayer()
     Cases to test:
-    1. song name not given (catch BadRequestException)
-    2. duration not given (catch BadRequestException)
-    3. valid song is added (check if number of songs increased by one and check metadata)
-    4. invalid session ID (error is thrown)
+    1. song name not given (catch BadRequestException)  (done)
+    2. duration not given (catch BadRequestException)  (done)
+    3. valid song is added (check if number of songs increased by one and check metadata)  (done)
+    4. invalid session ID (error is thrown)  (done)
 
     Route b: api/songs/<sessionID>/upload
     CRUD operation: PUT
     Service method tested: putSong(), uploadSong()
     Cases to test:
-    1. session is non-existent (catch BadRequestException)
-    2. member ID is invalid (catch BadRequestException)    
-    3. normal case: song file is provided, for a new song
+    1. session is non-existent (catch BadRequestException)  (done)
+    2. member ID is invalid (catch BadRequestException)    (done)
+    3. normal case: song file is provided, for a new song  (done)
  
     Route c: api/songs/<songID>
     CRUD operation: GET
     Service method tested: getById()
     Cases to test:
-    1. getting a song which is not yet created, in which case queryset is empty
-    2. for a song which is created, queryset should have 1 song. check metadata
+    1. getting a song which is not yet created, in which case queryset is empty  (done)
+    2. for a song which is created, queryset should have 1 song. check metadata  (done)
 
     Route d: api/songs?name=<songName>
     CRUD operation: GET
     Service method tested: getByName()
     Cases to test:
-    1. getting a song which is not yet created, in which case queryset is empty
-    2. trying to get a song with an invalid name (name != 'My New Song')
-    3. for a song which is created, queryset should have 1 song, if the name is correct. check matadata
+    1. trying to get a song with an invalid name (name != 'My New Song'). so queryset is empty  (done)
+    2. for a song which is created, queryset should have 1 song, if the name is correct. check matadata  (done)
 
-    Route e: api/songs/<songID>
+    Route e: api/songs?session=<sessionID>
     CRUD operation: GET
     Service method tested: getBySessionId()
     Cases to test:
-    1. getting a song for a session with no song yet created should return an empty queryset
-    2. 1 session is occuring, with a song made. ensure that the queryset returns just 1 song with proper metadata
-    3. 2 sessions are occuring, each with different songs. ensure that the queryset returns just 1 song still. also
-        make sure that each song corresponds to the proper session
+    1. getting a song for a session with a song created should return a song  (done)
+    2. getting a song for a session with no song yet created should return an empty queryset  (done)
 
     Route f: api/songs
     CRUD operation: GET
     Service method tested: getAll()
     Cases to test:
-    1. no songs are created at all, so queryset is empty
-    2. one song is created, so queryset has 1 song
-    3. another song is created, so queryset has 2 songs
+    1. no songs are created at all, so queryset is empty  (done)
+    2. one song is created, so queryset has 1 song  (done)
+    3. another song is created, so queryset has 2 songs  (done)
 
     Route g: api/songs/<songID>
     CRUD operation: DELETE
@@ -93,6 +91,12 @@ def testSongAll(app, client, auth):
     response = client.get('api/songs')
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert len(jsonResponse) == 0
+
+    # case g1
+    response = client.delete('api/songs/' + str(badId))
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "no song found" in jsonResponse['message']
 
     # case c1
     response = client.get('api/songs/' + str(badId))
@@ -194,3 +198,75 @@ def testSongAll(app, client, auth):
     response = client.get('api/songs')
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert len(jsonResponse) == 1
+    songId = jsonResponse[0]['songId']
+    
+    # case c2
+    response = client.get('api/songs/' + songId)
+    assert response is not None
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert jsonResponse['songId'] == songId
+    songName = jsonResponse['name']
+
+    # case d1
+    response = client.get('api/songs?name=' + 'badname')
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert jsonResponse == []
+    
+    # case d2
+    response = client.get('api/songs?name=' + songName)
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert len(jsonResponse) == 1
+    assert jsonResponse[0]['name'] == songName
+
+    # case e1
+    response = client.get('api/songs?session=' + sessionId)
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert len(jsonResponse) == 1
+    assert jsonResponse[0]['name'] == songName
+
+    # case e2
+    # first make a 2nd session with greg and vi
+    gregId = uuid.UUID('693d350f-9cd0-4812-83c4-f1a98a8100ff')
+    viId = uuid.UUID('0dfedda5-ddd3-481f-90d9-6ee388c4093e')
+    song2id = None
+    with app.app_context():
+        songs = getAllSongs()
+        assert len(songs) == 1
+        joinOrAttemptMatch(gregId)
+        joinOrAttemptMatch(viId)
+        songs = getAllSongs()
+        assert len(songs) == 1
+        currSong = getBySessionId(viId)
+        assert currSong == None
+    
+        # create new song with this session
+        session2Id = getSessionByMemberId(gregId).sessionId
+        body = {
+            'name': 'another new song!',
+            'duration': 10,
+        }
+        newSong = addSong(session2Id, gregId, body)
+        song2id = str(newSong.songId)
+    
+    # case f3
+    response = client.get('api/songs')
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert len(jsonResponse) == 2
+
+    # case g2
+    response = client.delete('api/songs/' + song2id)
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "you cannot delete this song" in jsonResponse['message']
+
+    # case g3
+    response = client.delete('api/songs/' + songId)
+    assert response.status_code == 200
+    deletedSong = json.loads(response.data.decode('utf-8'))
+    assert deletedSong['session']['bucketUrl'] == None
+    with app.app_context():
+        query = getAllSongs()
+        assert len(query) == 1
+
+    
+

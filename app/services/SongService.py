@@ -30,7 +30,6 @@ def getAllBySessionId(sessionId):
 def deleteSong(songId, memberId):
     song = getById(songId)
     if song == None:
-        print('no song found')
         raise ServerErrorException('no song found')
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
         raise UnauthorizedException('you cannot delete this song')
@@ -41,7 +40,8 @@ def deleteSong(songId, memberId):
                 deleteBucketFile(song.session.bucketUrl)
         except Exception:
             raise ServerErrorException('could not delete song')
-    try: 
+    try:
+        song.session.bucketUrl = None
         db.session.delete(song)
         db.session.commit()
         return song
