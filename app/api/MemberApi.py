@@ -1,4 +1,5 @@
-from flask import jsonify
+import uuid
+from flask import jsonify, request
 from flask_restful import Resource, reqparse
 from app.services.MemberService import *
 
@@ -25,3 +26,12 @@ class MemberApi(Resource):
         if email != None:
             return jsonify(getByEmail(email))
         return jsonify(getAll())
+
+class MemberOnlineApi(Resource):
+
+    def get(self):
+        memberId = request.headers['MEMBERID']
+        if memberId == None:
+            raise BadRequestException('no member id')
+        memberId = uuid.UUID(memberId)
+        return jsonify(getAllOnline(memberId))

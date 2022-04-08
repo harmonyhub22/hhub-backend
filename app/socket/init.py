@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_socketio import SocketIO, leave_room, join_room, rooms
 from flask_socketio import emit
-from app.services.MemberService import getMemberFromSid, getSid, setSid, updateSid, setOnline, setOffline, getBySid
+from app.services.MemberService import getSid, setSid, updateSid, setOnline, setOffline, getBySid
 from app.services.SessionService import getById as getSessionById
 from app.services.LayerService import getById as getLayerById
 
@@ -51,7 +51,7 @@ def message(json):
 def joinRoom(json):
     print('received json: ' + str(json))
     sid = request.sid
-    member = getMemberFromSid(sid)
+    member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         print('no session id sent')
@@ -67,7 +67,7 @@ def joinRoom(json):
 @sio.on('pull_layer')
 def pull_layer(json):
     sid = request.sid
-    member = getMemberFromSid(sid)
+    member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
@@ -80,7 +80,7 @@ def pull_layer(json):
 @sio.on('session_vote_end')
 def sessionVoteEnd(json):
     sid = request.sid
-    member = getMemberFromSid(sid)
+    member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
@@ -93,7 +93,7 @@ def sessionVoteEnd(json):
 @sio.on('session_unvote_end')
 def sessionUnVoteEnd(json):
     sid = request.sid
-    member = getMemberFromSid(sid)
+    member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return
@@ -107,7 +107,7 @@ def sessionUnVoteEnd(json):
 def sessionRoomMessage(json):
     sid = request.sid
     print(sid)
-    member = getMemberFromSid(sid)
+    member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
         return

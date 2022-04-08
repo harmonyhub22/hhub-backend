@@ -20,7 +20,10 @@ def getAll():
     return Member.query.all()
 
 def getBySid(sid):
-    return Member.query.filter(Member.sid==sid)
+    return Member.query.filter(Member.sid==sid).first()
+
+def getAllOnline(memberId):
+    return Member.query.filter((Member.isOnline==True) & (Member.memberId!=memberId)).all()
 
 def addMember(email, firstname, lastname):
     try:
@@ -91,6 +94,3 @@ def updateSid(memberId, sid=None):
     except Exception:
         db.session.rollback()
         raise ServerErrorException('could not add sid to member')
-
-def getMemberFromSid(sid):
-    return Member.query.filter(Member.sid==sid).first()
