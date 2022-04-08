@@ -51,7 +51,7 @@ def seed():
     # sessions
     session1 = Session(member1.memberId, member4.memberId) # greg and dean join a session
     session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
-    session1.endTime = datetime.datetime.utcnow()
+    # session1.endTime = datetime.datetime.utcnow()
     s.add(session1)
 
     s.commit()

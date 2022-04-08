@@ -7,7 +7,7 @@ from app.api.MatchingQueueApi import MatchingQueueApi
 from app.db.db import db
 from app.db.seed.seedData import seed
 from app.db.seed.seedTestData import seedTest
-from app.api.MemberApi import MemberApi
+from app.api.MemberApi import MemberApi, MemberOnlineApi
 from app.api.LayerApi import LayerApi
 from app.api.SessionApi import SessionApi, SessionEndApi, SessionLiveApi
 from app.api.CommonApi import CommonApi
@@ -100,6 +100,7 @@ def create_app(test_config=None):
         api.add_resource(AuthenticationApi, '/api/login', '/api/signup')
         api.add_resource(LogoutApi, '/api/logout')
         api.add_resource(MemberApi, '/api/members', '/api/members/<id>')
+        api.add_resource(MemberOnlineApi, '/api/members/online')
         api.add_resource(SessionLiveApi, '/api/session/live')
         api.add_resource(SessionApi, '/api/session', '/api/session/<id>')
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
