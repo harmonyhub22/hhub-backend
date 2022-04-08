@@ -2,7 +2,8 @@ from http import HTTPStatus
 import uuid
 from flask import Response, jsonify, request
 from flask_restful import Resource, reqparse
-from app.services.MatchingQueueService import *
+from app.exceptions.BadRequestException import BadRequestException
+from app.services.MatchingQueueService import leave, getAll, getById, getByMemberId, joinOrAttemptMatch
 
 # Define parser and request args
 parser = reqparse.RequestParser()
@@ -26,6 +27,9 @@ class MatchingQueueApi(Resource):
 
     def delete(self):
         memberId = request.headers['MEMBERID']
+        if memberId == None:
+            raise BadRequestException('no member id found')
+        memberId = uuid.UUID(memberId)
         leave(memberId)
         return Response(status=HTTPStatus.NO_CONTENT)
 

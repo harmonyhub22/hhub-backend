@@ -67,10 +67,12 @@ def joinOrAttemptMatch(memberId):
         
 def leave(memberId):
     existing_record = getByMemberId(memberId)
-    if existing_record != None:
-        try:
-            db.session.delete(existing_record)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise ServerErrorException('could not remove you from the queue')
+    if existing_record == None:
+        raise BadRequestException('not in the queue')
+    print(existing_record.matchingQueueId)
+    try:
+        db.session.delete(existing_record)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise ServerErrorException('could not remove you from the queue')
