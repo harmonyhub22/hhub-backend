@@ -5,9 +5,12 @@ import uuid
 from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
-from app.services.SessionService import getByMemberId as getByMemberIdSession, getLiveSession
+from app.services.SessionService import getById as getByIdSession
+from app.services.SongService import getAll as getAllSongs
 from requests_toolbelt import MultipartEncoder
 from werkzeug.utils import secure_filename
+
+from app.services.SongService import uploadSong
 
 # one function to test all song routes and services
 def testSongAll(app, client, auth):
@@ -32,11 +35,11 @@ def testSongAll(app, client, auth):
     CRUD operation: POST
     Service method tested: addOrEditLayer()
     Cases to test:
-    1. valid song is added (check if number of songs increased by one and check metadata)
-    2. invalid session ID (error is thrown)
-    '''
-    
-    '''
+    1. song name not given (catch BadRequestException)
+    2. duration not given (catch BadRequestException)
+    3. valid song is added (check if number of songs increased by one and check metadata)
+    4. invalid session ID (error is thrown)
+
     Route b: api/songs/<sessionID>/upload
     CRUD operation: PUT
     Service method tested: putSong(), uploadSong()
@@ -44,19 +47,14 @@ def testSongAll(app, client, auth):
     1. session is non-existent (catch BadRequestException)
     2. member ID is invalid (catch BadRequestException)    
     3. normal case: song file is provided, for a new song
-    '''
-
-    '''
+ 
     Route c: api/songs/<songID>
     CRUD operation: GET
     Service method tested: getById()
     Cases to test:
     1. getting a song which is not yet created, in which case queryset is empty
     2. for a song which is created, queryset should have 1 song. check metadata
-    3. just checking link for some reason
-    '''
 
-    '''
     Route d: api/songs?name=<songName>
     CRUD operation: GET
     Service method tested: getByName()
@@ -64,9 +62,7 @@ def testSongAll(app, client, auth):
     1. getting a song which is not yet created, in which case queryset is empty
     2. trying to get a song with an invalid name (name != 'My New Song')
     3. for a song which is created, queryset should have 1 song, if the name is correct. check matadata
-    '''
 
-    '''
     Route e: api/songs/<songID>
     CRUD operation: GET
     Service method tested: getBySessionId()
@@ -75,9 +71,7 @@ def testSongAll(app, client, auth):
     2. 1 session is occuring, with a song made. ensure that the queryset returns just 1 song with proper metadata
     3. 2 sessions are occuring, each with different songs. ensure that the queryset returns just 1 song still. also
         make sure that each song corresponds to the proper session
-    '''
 
-    '''
     Route f: api/songs
     CRUD operation: GET
     Service method tested: getAll()
@@ -85,9 +79,7 @@ def testSongAll(app, client, auth):
     1. no songs are created at all, so queryset is empty
     2. one song is created, so queryset has 1 song
     3. another song is created, so queryset has 2 songs
-    '''
 
-    '''
     Route g: api/songs/<songID>
     CRUD operation: DELETE
     Service method tested: deleteSong()
@@ -97,9 +89,108 @@ def testSongAll(app, client, auth):
     3. normal case: delete a song that you have the rights to. queryset size should decrease by 1 and remove the right layer
     '''
 
-     # case c1
+    # case f1
+    response = client.get('api/songs')
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert len(jsonResponse) == 0
+
+    # case c1
     response = client.get('api/songs/' + str(badId))
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert jsonResponse == []
+    assert jsonResponse == None
 
+    # case a1
+    body = {
+        'duration': 7,
+    }
+    response = client.post(
+        'api/songs/' + sessionId,
+        data=json.dumps(body),
+        headers={"Content-Type": "application/json"}
+    )
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "song name or duration not provided" in jsonResponse['message']
 
+    # case a2
+    body = {
+        'name': 'new song!',
+    }
+    response = client.post(
+        'api/songs/' + sessionId,
+        data=json.dumps(body),
+        headers={"Content-Type": "application/json"}
+    )
+    assert response.status_code != 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "song name or duration not provided" in jsonResponse['message']
+
+    # case a3
+    body = {
+        'name': 'new song!',
+        'duration': 7,
+    }
+    response = client.post(
+        'api/songs/' + sessionId,
+        data=json.dumps(body),
+        headers={"Content-Type": "application/json"}
+    )
+    assert response.status_code == 200
+    song = json.loads(response.data.decode('utf-8'))
+    assert song['name'] == 'new song!'
+    assert song['duration'] == 7
+    assert song['session']['sessionId'] == sessionId
+    assert song['session']['member1']['memberId'] == str(deanId)
+    assert song['session']['member2']['memberId'] == str(willId)
+    with app.app_context():
+        query = getAllSongs()
+        assert len(query) == 1
+
+    # case a4
+    response = client.post(
+        'api/songs/' + str(badId),
+        data=json.dumps(body),
+        headers={"Content-Type": "application/json"}
+    )
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "session does not exist" in jsonResponse['message']
+
+    # case b1
+    m = MultipartEncoder(fields={'file': ('file', open('tests/song.mp3', 'rb'), 'audio/mpeg')})
+    response = client.put(
+        'api/songs/' + str(badId) + '/upload',
+        data=m,
+        headers={"Content-Type": m.content_type}
+    )
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert "you cannot upload this file" in jsonResponse['message']
+
+    # case b2
+    with app.app_context():
+        filename = secure_filename('file')
+        songFile = ('file', open('tests/song.mp3', 'rb'))
+        try:
+            uploadSong(sessionId, badId, songFile, filename, 'audio/mpeg')
+        except BadRequestException as exc:
+            assert "you cannot upload this file" in exc.message
+
+    # case b3
+    with app.app_context():
+        session = getByIdSession(sessionId)
+    assert session.bucketUrl == None
+    m = MultipartEncoder(fields={'file': ('file', open('tests/song.mp3', 'rb'), 'audio/mpeg')})
+    response = client.put(
+        'api/songs/' + sessionId + '/upload',
+        data=m,
+        headers={"Content-Type": m.content_type}
+    )
+    assert response.status_code == 200
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    with app.app_context():
+        session = getByIdSession(sessionId)
+    assert session.bucketUrl != None
+
+    # case f2
+    response = client.get('api/songs')
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert len(jsonResponse) == 1

@@ -7,7 +7,7 @@ from app.services.SongService import uploadSong
 from flask import Blueprint
 
 layerUploadBlueprint = Blueprint('layer_upload_blueprint', __name__, url_prefix='/api/session/<sessionId>/layers/<layerId>')
-songUploadBlueprint = Blueprint('song_upload_blueprint', __name__, url_prefix='/api/session/<sessionId>')
+songUploadBlueprint = Blueprint('song_upload_blueprint', __name__, url_prefix='/api/songs/<sessionId>')
 
 @layerUploadBlueprint.route('/upload', methods=['POST', 'PUT'])
 def postLayer(sessionId, layerId):
@@ -32,6 +32,8 @@ def deleteLayer(sessionId, layerId):
 
 @songUploadBlueprint.route('/upload', methods=['PUT'])
 def putSong(sessionId):
+    memberId = request.headers['MEMBERID']
+    memberId = uuid.UUID(memberId)
 
     songFile = request.files['file']
     if not songFile:
@@ -40,4 +42,4 @@ def putSong(sessionId):
     fileName = secure_filename(songFile.filename)
     contentType = request.mimetype
 
-    return jsonify(uploadSong(sessionId, songFile, fileName, contentType))
+    return jsonify(uploadSong(sessionId, memberId, songFile, fileName, contentType))

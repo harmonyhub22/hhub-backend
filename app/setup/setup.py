@@ -17,6 +17,7 @@ from app.exceptions.ErrorHandler import handle_error
 from app.middleware.Auth import getCookie
 from app.socket.init import sio
 from app.controller.upload import layerUploadBlueprint
+from app.controller.upload import songUploadBlueprint
 
 def create_app(test_config=None):
     app_path = os.path.dirname(os.path.abspath(__file__))
@@ -94,6 +95,7 @@ def create_app(test_config=None):
         app.register_error_handler(Exception, handle_error)
 
         app.register_blueprint(layerUploadBlueprint)
+        app.register_blueprint(songUploadBlueprint)
 
         # add all restful api routes
         api.add_resource(CommonApi, '/api/')

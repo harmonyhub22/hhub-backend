@@ -50,17 +50,18 @@ def deleteSong(songId, memberId):
         raise ServerErrorException('could not delete song')
 
 def addSong(sessionId, memberId, data):
-    name = data['name']
-    duration = data['duration']
+    name = data.get('name')
+    duration = data.get('duration')
     if name == None or duration == None:
         raise BadRequestException('song name or duration not provided')
     
     session = getSessionById(sessionId)
     if session == None:
         raise BadRequestException('session does not exist')
-    if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
-        raise UnauthorizedException('you save this song')
-         
+    
+    if session.member1.memberId != memberId and session.member2.memberId != memberId:
+        raise UnauthorizedException('unable to save this song')
+
     try:
         song = Song(sessionId, memberId, name, duration)   
         db.session.add(song)
