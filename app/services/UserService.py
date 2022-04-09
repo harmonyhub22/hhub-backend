@@ -16,7 +16,6 @@ def getUserID(userID):
 def addUser(userName, password):
     try:
         user = User(userName, password)
-        print("The user is", user)
         db.session.add(user)
         db.session.commit()
         return user

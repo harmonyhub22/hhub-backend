@@ -267,6 +267,3 @@ def testSongAll(app, client, auth):
     with app.app_context():
         query = getAllSongs()
         assert len(query) == 1
-
-    
-
