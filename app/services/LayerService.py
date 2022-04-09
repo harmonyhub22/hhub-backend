@@ -45,7 +45,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     duration = data['duration']
     fadeInDuration = data['fadeInDuration']
     fadeOutDuration = data['fadeOutDuration']
-    isReversed = data['reversed']
+    reversed = data['reversed']
     trimmedStartDuration = data['trimmedStartDuration']
     trimmedEndDuration = data['trimmedEndDuration']
     fileName = data['fileName']
@@ -53,7 +53,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     if layerId == None: # adding a new layer
         try:
             record = Layer(sessionId, memberId, name, startTime, duration, fadeInDuration,
-                fadeOutDuration, isReversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
+                fadeOutDuration, reversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
             db.session.add(record)
             db.session.commit()
             return record
@@ -67,7 +67,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
         existing_record.duration = duration
         existing_record.fadeInDuration = fadeInDuration
         existing_record.fadeOutDuration = fadeOutDuration
-        existing_record.isReversed = isReversed
+        existing_record.reversed = reversed
         existing_record.trimmedStartDuration = trimmedStartDuration
         existing_record.trimmedEndDuration = trimmedEndDuration
         existing_record.fileName = fileName
@@ -97,13 +97,19 @@ def deleteFile(sessionId, layerId, memberId):
 def deleteLayer(sessionId, memberId, layerId):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
+        print('cannot edit')
         raise BadRequestException('you cannot delete this layer')
 
+    layerId = uuid.UUID(layerId)
     layer = getById(layerId)
-    if layer == None or layer.sessionId != uuid.UUID(sessionId):
+    if layer == None: # already deleted
+        return {}
+    if layer.sessionId != uuid.UUID(sessionId):
+        print('layer not found')
         raise BadRequestException('layer is not in this session')
     
-    deleteFile(sessionId, layerId, memberId)
+    if layer.bucketUrl != None:
+        deleteFile(sessionId, layerId, memberId)
 
     try:
         db.session.delete(layer)
