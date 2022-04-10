@@ -145,7 +145,7 @@ def testLoginWithNoneMember(app,auth):
         if member is None:
             response = auth.login(email)
             jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'Account does not exist or incorrect. Please create an account first!' == jsonResponse['reason']
+            assert 'Account does not exist! Please create an account first, or check that you entered the correct information!' == jsonResponse['reason']
             
 def testLoginWithNoneAuthMember(app,auth):
     email = "jennie@gmail.com"
@@ -157,4 +157,4 @@ def testLoginWithNoneAuthMember(app,auth):
         if authMember is None:
             response = auth.login(email)
             jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'Account does not exist or incorrect. Please create an account first!' == jsonResponse['reason']
+            assert 'There was a problem logging you in. We are sorry about that! Please try again later.' == jsonResponse['reason']

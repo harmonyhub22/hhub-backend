@@ -30,19 +30,19 @@ class AuthenticationApi(Resource):
         member = getMemberByEmail(data.get('email'))
 
         if not member:
-            authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
+            authResp['reason'] = "Account does not exist! Please create an account first, or check that you entered the correct information!"
             return make_response(jsonify(authResp), 400)
         
         authMember = getAuthByMemberId(member.memberId)
         if not authMember:
-            authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
+            authResp['reason'] = "There was a problem logging you in. We are sorry about that! Please try again later."
             return make_response(jsonify(authResp), 400)
     
         if check_password_hash(authMember.password, data['password']):
             try:
                 token = generateToken(authMember.memberId)
             except:
-                authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
+                authResp['reason'] = "There was a problem logging you in. We are sorry about that! Please try again later."
                 return make_response(jsonify(authResp), 401)
 
             authResp = make_response(jsonify({'success' : True}))
