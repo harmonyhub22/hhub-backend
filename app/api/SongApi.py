@@ -28,7 +28,7 @@ class SongApi(Resource):
             return jsonify(getAllByUser(memberId))
         return jsonify(getAll())
 
-    def post(self, sessionId, id=None):
+    def post(self, sessionId):
         data = request.get_json(force=True)
         memberId = request.headers['MEMBERID']
         if not memberId:

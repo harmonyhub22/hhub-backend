@@ -28,16 +28,14 @@ class Song(db.Model):
     sessionId = db.Column('session_id', UUID(as_uuid=True), db.ForeignKey(Session.sessionId), nullable=False)
     memberId = db.Column('member_id', UUID(as_uuid=True), db.ForeignKey(Member.memberId), nullable=False)
     name = db.Column('name', db.String(30), nullable=False, default='My New Song')
-    duration = db.Column('duration', db.Integer, default=60)
     createdAt = db.Column('created_at', db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     session = db.relationship('Session', uselist=False, foreign_keys=[sessionId])
     member = db.relationship('Member', uselist=False, foreign_keys=[memberId])
 
-    def __init__(self, sessionId, memberId, name, duration):
+    def __init__(self, sessionId, memberId, name):
         self.sessionId = sessionId
         self.memberId = memberId
         self.name = name
-        self.duration = duration
 
     def __repr__(self):
         return '<song %s>' % str(self.songId)
