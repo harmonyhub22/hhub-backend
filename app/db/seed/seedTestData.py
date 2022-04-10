@@ -92,9 +92,8 @@ def seedTest():
     #s.commit()
 
     # songs
-    song1 = Song(session1.sessionId, 'Some song', 60)
+    song1 = Song(session1.sessionId, 'Some song')
     song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
-    song1.name = 'yessir'
     s.add(song1)
 
     # s.commit()

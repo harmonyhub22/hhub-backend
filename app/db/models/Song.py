@@ -21,7 +21,6 @@ class Song(db.Model):
     session: Session
     member: Member
     name: str
-    duration: int
     createdAt: DateTime
 
     songId = db.Column('song_id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
