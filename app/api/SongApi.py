@@ -31,6 +31,7 @@ class SongApi(Resource):
     def post(self, sessionId):
         data = request.get_json(force=True)
         memberId = request.headers['MEMBERID']
+        
         if not memberId:
             raise BadRequestException('no member ID')
         memberId = uuid.UUID(memberId)

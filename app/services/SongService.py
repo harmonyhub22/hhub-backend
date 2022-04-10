@@ -30,18 +30,18 @@ def getAllBySessionId(sessionId):
 def deleteSong(songId, memberId):
     song = getById(songId)
     if song == None:
-        print('no song found')
         raise ServerErrorException('no song found')
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
         raise UnauthorizedException('you cannot delete this song')
     songs = getAllBySessionId(song.sessionId)
-    if songs != None and len(songs) == 1:
+    if songs == None or len(songs) == 1:
         try:
             if song.session.bucketUrl != None:
                 deleteBucketFile(song.session.bucketUrl)
+                song.session.bucketUrl = None
         except Exception:
             raise ServerErrorException('could not delete song')
-    try: 
+    try:
         db.session.delete(song)
         db.session.commit()
         return song
@@ -50,16 +50,17 @@ def deleteSong(songId, memberId):
         raise ServerErrorException('could not delete song')
 
 def addSong(sessionId, memberId, data):
-    name = data['name']
+    name = data.get('name')
     if name == None:
         raise BadRequestException('song name not provided')
     
     session = getSessionById(sessionId)
     if session == None:
         raise BadRequestException('session does not exist')
+    
     if session.member1.memberId != memberId and session.member2.memberId != memberId:
-        raise UnauthorizedException('you save this song')
-         
+        raise UnauthorizedException('unable to save this song')
+
     try:
         song = Song(sessionId, memberId, name)   
         db.session.add(song)
@@ -82,6 +83,8 @@ def uploadSong(sessionId, memberId, songFile, fileName, contentType):
     db.session.commit()
     return session
 
+'''
 def deleteAllFiles():
     songs = getAll()
     deleteAllSongFiles(songs)
+'''

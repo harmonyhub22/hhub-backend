@@ -7,7 +7,6 @@ from app.services.AuthService import getByMemberId as getAuthByMemberId, addOrUp
 from app.services.AuthService import generateToken
 from app.exceptions.ServerErrorException import ServerErrorException
 
-
 '''
 Route: api/signup
 REST operation: POST
@@ -19,10 +18,11 @@ Cases to test:
 4. is a member and tries signing up again, so it logs them in. check 200 response
 '''
 def testSignup(client):
-    # check for the correct route
-    response = client.post('/api/signup', 
-                           data=json.dumps({'email': 'a', 'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
-                           headers={"Content-Type": "application/json"})
+    response = client.post(
+        '/api/signup', 
+        data=json.dumps({'email': 'a', 'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
+        headers={"Content-Type": "application/json"}
+    )
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert jsonResponse['success'] == True
     
@@ -54,15 +54,6 @@ def testSignupWithInvalidMember(app):
     with app.app_context():
         member = getMemberByEmail(email)
         assert member is None
-        
-# def testSignupAddExistingMember(app, auth):
-#     auth.login()
-#     email = "vitruong00@tamu.edu"
-#     firstname = "Vi"
-#     lastname = "Truong"
-#     with pytest.raises(ServerErrorException) as excinfo:
-#         addMember(email, firstname, lastname)
-#         assert "could not add member" in str(excinfo.value)
 
 def testSignupWithAuthMember(app):
     memberId = uuid.UUID('0dfedda5-ddd3-481f-90d9-6ee388c4093e')
@@ -106,15 +97,7 @@ def testSignupWithGenerateTokenForNoneMember(app):
         token = generateToken(authMember.memberId)
         assert token is not None
 
-'''
-Route: api/login
-REST operation: PUT
-Service methods tested: getByMemberId(), generateToken()
-Cases to test:
-1. email is not provided (catch 400 error)
-2. password is not provided (catch 400 error)
-5. normal case: correct info provided. check 200 response
-'''
+
 def testLogin(auth):
     response = auth.login()
     jsonResponse = json.loads(response.data.decode('utf-8'))
@@ -123,8 +106,8 @@ def testLogin(auth):
 @pytest.mark.parametrize(('email', 'password', 'message'), (
 ('', 'a', 'Please provide your email.'),
 ('vitruong00@tamu.edu', '', 'Please provide a password.'),
-('a', 'password', 'Account does not exist or incorrect. Please create an account first!'),
-('a', 'a', 'Account does not exist or incorrect. Please create an account first!'),
+('a', 'password', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
+('a', 'a', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
 ('vitruong00@tamu.edu', 'a', 'Incorrect password!'),
 ))
 def testLoginValidateInput(auth, email, password, message):
@@ -162,7 +145,7 @@ def testLoginWithNoneMember(app,auth):
         if member is None:
             response = auth.login(email)
             jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'Account does not exist or incorrect. Please create an account first!' == jsonResponse['reason']
+            assert 'Account does not exist! Please create an account first, or check that you entered the correct information!' == jsonResponse['reason']
             
 def testLoginWithNoneAuthMember(app,auth):
     email = "jennie@gmail.com"
@@ -174,20 +157,4 @@ def testLoginWithNoneAuthMember(app,auth):
         if authMember is None:
             response = auth.login(email)
             jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'Account does not exist or incorrect. Please create an account first!' == jsonResponse['reason']
-            
-'''
-Route: api/logout
-REST operation: POST
-Service methods tested: none (just deletes cookie)
-Cases to test:
-1. normal logout. check 200 response
-'''
-@pytest.mark.order(3)
-def testLogout(client, auth):
-    auth.login()
-    
-    with client:
-        response = auth.logout()
-        jsonResponse = json.loads(response.data.decode('utf-8'))
-        assert jsonResponse == {}
+            assert 'There was a problem logging you in. We are sorry about that! Please try again later.' == jsonResponse['reason']

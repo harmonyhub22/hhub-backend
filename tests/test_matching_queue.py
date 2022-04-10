@@ -8,6 +8,7 @@ from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken
+from app.services.MatchingQueueService import leave
 from app.services.MemberService import setSid
 from app.services.SessionService import getByMemberId as getByMemberIdSession
 from app.services.AuthService import getByMemberId as getByMemberIdAuth
@@ -32,7 +33,6 @@ def testJoinQueue(app, client, auth):
         authMember = getByMemberIdAuth(deanId)
         token = generateToken(authMember.memberId)
         client.set_cookie(app, 'hhub-token', str(token))
-        #setSid(deanId, '123')  # uncomment this if we are also testing web sockets
 
     # initial checking (Will is in the queue (from seed data))
     with app.app_context():
@@ -88,6 +88,7 @@ Cases to test:
 '''
 def testLeaveQueue(app, client, auth):
     deanId = uuid.UUID('28cf2179-74ed-4fab-a14c-3c09bd904365')
+    willId = uuid.UUID('73f80e58-bc0e-4d35-b0d8-d711a26299ac')
 
     auth.login()
     with app.app_context():
@@ -95,11 +96,9 @@ def testLeaveQueue(app, client, auth):
         token = generateToken(authMember.memberId)
         client.set_cookie(app, 'hhub-token', str(token))
     
-    # case 1
-    response = client.post('/api/queue')
-    response = client.delete('/api/queue')
-    assert response.status_code == HTTPStatus.NO_CONTENT
+    # case 1 (assume seed data puts just Will in the queue. this tests him leaving)
     with app.app_context():
+        leave(willId)
         query = MatchingQueue.query.all()
         assert len(query) == 0
 

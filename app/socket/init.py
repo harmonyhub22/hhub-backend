@@ -53,7 +53,6 @@ def connect():
 '''
 @sio.event
 def message(json):
-    print('received json: ' + str(json))
     emit('message', 'sup')
 '''
 
@@ -116,7 +115,6 @@ def sessionUnVoteEnd(json):
 @sio.on('session_room_message')
 def sessionRoomMessage(json):
     sid = request.sid
-    print(sid)
     member = getBySid(sid)
     sessionId = json['sessionId']
     if sessionId == None:
@@ -130,7 +128,6 @@ def sessionRoomMessage(json):
     elif musicSession.member2.memberId == member.memberId:
         name = str(musicSession.member2.firstname + ' ' + musicSession.member2.lastname)
     data = dict()
-    print(json)
     data['name'] = name
     data['message'] = json['message']
     if musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):

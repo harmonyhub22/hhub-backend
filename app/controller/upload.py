@@ -32,6 +32,8 @@ def deleteLayer(sessionId, layerId):
 
 @songUploadBlueprint.route('/upload', methods=['PUT'])
 def putSong(sessionId):
+    memberId = request.headers['MEMBERID']
+    memberId = uuid.UUID(memberId)
 
     songFile = request.files['file']
     if not songFile:

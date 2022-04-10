@@ -58,13 +58,12 @@ def create_app(test_config=None):
         
         db.create_all()
         
-        if test_config is None:
-            seed()
-        else:
-            seedTest()
-
         if local:
-            seed()
+            if test_config is None:
+                seed()
+            else:
+                seedTest()
+
         @app.route('/favicon.ico')
         def favicon():
             return send_from_directory(app.root_path,
