@@ -16,26 +16,30 @@ class AuthenticationApi(Resource):
         authResp = {
             'reason': ''
         }
-        #print(data)
+        print(data)
 
         if not data:
             authResp['reason'] = "Please provide your information."
             return make_response(jsonify(authResp), 400)
         elif not data.get('email'):
+            print('no email')
             authResp['reason'] = "Please provide your email."
             return make_response(jsonify(authResp), 400)
         elif not data.get('password'):
+            print('no password')
             authResp['reason'] = "Please provide a password."
             return make_response(jsonify(authResp), 400)
             
         member = getMemberByEmail(data.get('email'))
 
         if not member:
+            print('no member found')
             authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
             return make_response(jsonify(authResp), 400)
         
         authMember = getAuthByMemberId(member.memberId)
         if not authMember:
+            print('no auth')
             authResp['reason'] = "Account does not exist or incorrect. Please create an account first!"
             return make_response(jsonify(authResp), 400)
     
@@ -43,14 +47,18 @@ class AuthenticationApi(Resource):
             token = ''
             try:
                 token = generateToken(authMember.memberId)
+                print('token', token)
             except:
+                print('could not generate token')
                 authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
                 return make_response(jsonify(authResp), 401)
 
+            print('setting cookie')
             authResp = make_response(jsonify({'success' : True}))
             authResp.set_cookie('hhub-token', value=str(token))
             return authResp
         else:
+            print('incorrect password')
             authResp['reason'] = "Incorrect password!"
             return make_response(jsonify(authResp), 403)
     
