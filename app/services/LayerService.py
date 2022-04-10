@@ -1,5 +1,5 @@
 import uuid
-from app.bucket.bucket import deleteBucketFile, uploadBucketFile, deleteAllLayerFiles
+from app.bucket.bucket import deleteBucketFile, uploadBucketFile
 from app.db.models.Layer import Layer
 from app.db.db import db
 from app.services.SessionService import getById as getSessionById
@@ -45,7 +45,6 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     duration = data['duration']
     fadeInDuration = data['fadeInDuration']
     fadeOutDuration = data['fadeOutDuration']
-    reversed = data['reversed']
     trimmedStartDuration = data['trimmedStartDuration']
     trimmedEndDuration = data['trimmedEndDuration']
     fileName = data['fileName']
@@ -53,7 +52,7 @@ def addOrEditLayer(sessionId, memberId, data, layerId=None):
     if layerId == None: # adding a new layer
         try:
             record = Layer(sessionId, memberId, name, startTime, duration, fadeInDuration,
-                fadeOutDuration, reversed, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
+                fadeOutDuration, trimmedStartDuration, trimmedEndDuration, None, fileName, y)
             db.session.add(record)
             db.session.commit()
             return record
@@ -118,6 +117,8 @@ def deleteLayer(sessionId, memberId, layerId):
     except Exception:
         db.session.rollback()
 
+'''
 def deleteAllFiles():
     layers = getAll()
     deleteAllLayerFiles(layers)
+'''

@@ -34,6 +34,7 @@ def deleteBucketFile(url):
     client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
 
 # helper functions to clear the bucket when developing/testing
+'''
 def deleteAllLayerFiles(layers):
     client = getBotoClient()
     for layer in layers:
@@ -42,6 +43,7 @@ def deleteAllLayerFiles(layers):
             filename = url[url.rfind('/') + 1:]
             client.delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
             deleteBucketFile(layer.bucketUrl)
+'''
 
 def deleteAllSongFiles(songs):
     client = getBotoClient()

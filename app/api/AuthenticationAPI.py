@@ -83,6 +83,9 @@ class AuthenticationApi(Resource):
         # If you are not a member, create a new member
         if not member:
             member = addMember(email, firstname, lastname)
+        else:
+            authResp['reason'] = "Member with this email already exists."
+            return make_response(jsonify(authResp), 400)
             
         authMember = getAuthByMemberId(member.memberId)
 
