@@ -47,7 +47,6 @@ class AuthenticationApi(Resource):
             token = ''
             try:
                 token = generateToken(authMember.memberId)
-                print('token', token)
             except:
                 print('could not generate token')
                 authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
@@ -55,7 +54,10 @@ class AuthenticationApi(Resource):
 
             print('setting cookie')
             authResp = make_response(jsonify({'success' : True}))
-            authResp.set_cookie('hhub-token', value=str(token))
+            try:
+                authResp.set_cookie('hhub-token', value=str(token), domain=os.getenv('CORS_ORIGIN'))
+            except:
+                authResp.set_cookie('hhub-token', value=str(token))
             return authResp
         else:
             print('incorrect password')
