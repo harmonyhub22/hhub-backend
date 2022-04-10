@@ -14,7 +14,9 @@ class AuthenticationApi(Resource):
     def put(self):
         data = request.get_json(force=True)
         authResp = {
-            'reason': ''
+            'reason': '',
+            'success': False,
+            'hhub-token': '',
         }
         print(data)
 
@@ -53,16 +55,14 @@ class AuthenticationApi(Resource):
                 return make_response(jsonify(authResp), 401)
 
             print('setting cookie')
-            authResp = make_response(jsonify({'success' : True}))
+            authResp['hhub-token'] = token
+            authResp['success'] = True
+            resp = make_response(jsonify(authResp))
             try:
-                print('domain set', os.getenv('COOKIE_DOMAIN'))
-                authResp.set_cookie(key='hhub-token', value=str(token), domain=str('.' + os.getenv('COOKIE_DOMAIN')),
-                    secure=True, path="/", httponly=False, expires=datetime.utcnow()+timedelta(minutes=1440), 
-                    samesite=None)
-            except:
-                print('no domain set')
-                authResp.set_cookie('hhub-token', value=str(token))
-            return authResp
+                resp.set_cookie(key='hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
+            except Exception:
+                resp.set_cookie(key='hhub-token', value=str(token))
+            return resp
         else:
             print('incorrect password')
             authResp['reason'] = "Incorrect password!"
@@ -73,7 +73,9 @@ class AuthenticationApi(Resource):
         data = request.get_json(force=True)
        
         authResp = {
-            'reason': ''
+            'reason': '',
+            'success': False,
+            'hhub-token': ''
         }
 
         if not data:
@@ -104,27 +106,22 @@ class AuthenticationApi(Resource):
             
         authMember = getAuthByMemberId(member.memberId)
 
-        # If you are a member but not authenticated yet
-        if not authMember:
-            newMember = addOrUpdateAuth(member.memberId, password)
-            try:
-                token = generateToken(newMember.memberId)
-            except:
-                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
-                return make_response(jsonify(authResp), 401)
-            
-            authResp = make_response(jsonify({'success' : True, 'reason': 'Account is already registered.'}))
-            authResp.set_cookie('hhub-token', value=str(token))
-            return authResp
-
-        # If are an authenticated member
-        else:
-            try:
-                token = generateToken(authMember.memberId)
-            except:
-                authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
-                return make_response(jsonify(authResp), 401)
-            
-            authResp = make_response(jsonify({'success' : True, 'reason': 'Account is already registered.'}))
-            authResp.set_cookie('hhub-token', value=str(token))
-            return authResp
+        if authMember != None:
+            authResp['reason'] = "Member with this password already exists"
+            return make_response(jsonify(authResp), 401)
+        
+        newMember = addOrUpdateAuth(member.memberId, password)
+        try:
+            token = generateToken(newMember.memberId)
+        except:
+            authResp['reason'] = "We are running into some issues, we apologize. Please try again later."
+            return make_response(jsonify(authResp), 401)
+        
+        authResp['success'] = True
+        authResp['hhub-token'] = str(token)
+        resp = make_response(jsonify(authResp))
+        try:
+            resp.set_cookie('hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
+        except Exception:
+            resp.set_cookie('hhub-token', value=str(token))
+        return resp
