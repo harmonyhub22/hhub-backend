@@ -56,7 +56,7 @@ class AuthenticationApi(Resource):
             authResp = make_response(jsonify({'success' : True}))
             try:
                 print('domain set', os.getenv('COOKIE_DOMAIN'))
-                authResp.set_cookie('hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
+                authResp.set_cookie('hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'), secure=True, path="/")
             except:
                 print('no domain set')
                 authResp.set_cookie('hhub-token', value=str(token))
