@@ -22,7 +22,7 @@ def getAll():
     return Song.query.all()
     
 def getAllByUser(memberId):
-    return Song.query.join(Session, Session.sessionId==Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt).all()
+    return Song.query.join(Session, Session.sessionId==Song.sessionId).filter(Song.memberId==memberId).order_by(Song.createdAt).all()
 
 def getAllBySessionId(sessionId):
     return Song.query.filter(Song.sessionId==sessionId).all()
@@ -57,7 +57,7 @@ def addSong(sessionId, memberId, data):
     session = getSessionById(sessionId)
     if session == None:
         raise BadRequestException('session does not exist')
-    if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
+    if session.member1.memberId != memberId and session.member2.memberId != memberId:
         raise UnauthorizedException('you save this song')
          
     try:
