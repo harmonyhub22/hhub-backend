@@ -34,14 +34,14 @@ def deleteSong(songId, memberId):
     if song.session.member1.memberId != memberId and song.session.member2.memberId != memberId:
         raise UnauthorizedException('you cannot delete this song')
     songs = getAllBySessionId(song.sessionId)
-    if songs != None and len(songs) == 1:
+    if songs == None or len(songs) == 1:
         try:
             if song.session.bucketUrl != None:
                 deleteBucketFile(song.session.bucketUrl)
+                song.session.bucketUrl = None
         except Exception:
             raise ServerErrorException('could not delete song')
     try:
-        song.session.bucketUrl = None
         db.session.delete(song)
         db.session.commit()
         return song

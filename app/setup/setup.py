@@ -106,7 +106,7 @@ def create_app(test_config=None):
         api.add_resource(SessionEndApi, '/api/session/<id>/end')
         api.add_resource(LayerApi, '/api/session/<sessionId>/layers', '/api/session/<sessionId>/layers/<id>')
         api.add_resource(MatchingQueueApi, '/api/queue', '/api/queue/<id>')
-        api.add_resource(SongApi, '/api/songs', '/api/songs/<id>')
+        api.add_resource(SongApi, '/api/songs', '/api/songs/<sessionId>')
 
         # Request pre and post processors
         app.before_request(getCookie)

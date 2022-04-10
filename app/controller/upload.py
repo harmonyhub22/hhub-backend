@@ -7,7 +7,7 @@ from app.services.SongService import uploadSong
 from flask import Blueprint
 
 layerUploadBlueprint = Blueprint('layer_upload_blueprint', __name__, url_prefix='/api/session/<sessionId>/layers/<layerId>')
-songUploadBlueprint = Blueprint('song_upload_blueprint', __name__, url_prefix='/api/songs/<sessionId>')
+songUploadBlueprint = Blueprint('song_upload_blueprint', __name__, url_prefix='/api/session/<sessionId>')
 
 @layerUploadBlueprint.route('/upload', methods=['POST', 'PUT'])
 def postLayer(sessionId, layerId):
