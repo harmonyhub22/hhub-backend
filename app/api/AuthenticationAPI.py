@@ -40,6 +40,7 @@ class AuthenticationApi(Resource):
             return make_response(jsonify(authResp), 400)
     
         if check_password_hash(authMember.password, data['password']):
+            token = ''
             try:
                 token = generateToken(authMember.memberId)
             except:
