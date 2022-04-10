@@ -73,14 +73,7 @@ def create_app(test_config=None):
     
         # CORS section
         @app.after_request
-        def after_request_func(response):
-            whitelistedOrigins = list(os.getenv('CORS_ORIGIN').split(','))
-            r = request.referrer[:-1]
-            print(r)
-            print(whitelistedOrigins[1])
-            if r not in whitelistedOrigins:
-                print('here')
-                raise BadRequestException('not allowed domain')  
+        def after_request_func(response): 
             if request.method == 'OPTIONS':
                 response = make_response()
                 response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
@@ -88,7 +81,7 @@ def create_app(test_config=None):
                 response.headers.add('Access-Control-Allow-Methods',
                                     'GET, POST, OPTIONS, PUT, PATCH, DELETE')
             response.headers.add('Access-Control-Allow-Credentials', 'true')
-            response.headers.add('Access-Control-Allow-Origin', r)
+            response.headers.add('Access-Control-Allow-Origin', os.getenv("CORS_ORIGIN"))
             return response
 
         @app.route('/')
