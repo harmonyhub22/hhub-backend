@@ -5,7 +5,7 @@ from app.exceptions.BadRequestException import BadRequestException
 from app.exceptions.ServerErrorException import ServerErrorException
 from app.services.MemberService import getSid
 from app.services.SessionService import createSession, getLiveSession
-from app.socket.init import addToRoom, emitMessageToRoom
+from app.socket.init import addToRoom, emitMessageToRoom, emitToSid, getSidRooms
 
 def getById(id):
     return MatchingQueue.query.get(id)
@@ -19,11 +19,7 @@ def getAll():
 def getTop():
     return MatchingQueue.query.order_by(MatchingQueue.timeEntered.asc()).first()
 
-def getTop2():
-    return MatchingQueue.query.order_by(MatchingQueue.timeEntered.asc()).limit(2).all()
-
-def match(member1Id): # if there are 2 users in the queue, create the session with them
-    queueItem = getTop()
+def match(member1Id, queueItem): # if there are 2 users in the queue, create the session with them
     db.session.delete(queueItem)
     db.session.commit()
     newSession = createSession(member1Id, queueItem.memberId)
@@ -42,16 +38,25 @@ def joinOrAttemptMatch(memberId):
         return existing_record
 
     # if theres 1 person currently in the queue, match with them
-    if len(getTop2()) == 1:
-        session = match(memberId)
+    topQueued = getTop()
+    if topQueued != None:
+        session = match(memberId, topQueued)
+        print(session.sessionId)
         try:
             sid1 = getSid(session.member1.memberId)
+            addToRoom(sid1, str('session-' + str(session.sessionId)))
+            print('sid1', sid1)
             sid2 = getSid(session.member2.memberId)
-            addToRoom(sid1, 'session-'+str(session.sessionId))
-            addToRoom(sid2, 'session-'+str(session.sessionId))
-            emitMessageToRoom('session_made', { 'sessionId': session.sessionId }, roomName='session-'+str(session.sessionId))
+            addToRoom(sid2, str('session-' + str(session.sessionId)))
+            print('sid2', sid2)
+            emitMessageToRoom("session_made", { 'sessionId': str(session.sessionId) }, roomName=str("session-" + str(session.sessionId)))
+            db.session.delete(topQueued)
+            db.session.commit()
             return None
-        except:
+        except Exception as e:
+            print('exception encountered')
+            print(str(e))
+            db.session.rollback()
             return None
     
     # otherwise, get added to the queue
