@@ -106,8 +106,8 @@ def testLogin(auth):
 @pytest.mark.parametrize(('email', 'password', 'message'), (
 ('', 'a', 'Please provide your email.'),
 ('vitruong00@tamu.edu', '', 'Please provide a password.'),
-('a', 'password', 'Account does not exist or incorrect. Please create an account first!'),
-('a', 'a', 'Account does not exist or incorrect. Please create an account first!'),
+('a', 'password', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
+('a', 'a', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
 ('vitruong00@tamu.edu', 'a', 'Incorrect password!'),
 ))
 def testLoginValidateInput(auth, email, password, message):

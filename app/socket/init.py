@@ -44,7 +44,6 @@ def connect():
 
 @sio.event
 def message(json):
-    print('received json: ' + str(json))
     emit('message', 'sup')
 
 @sio.on('join_session')

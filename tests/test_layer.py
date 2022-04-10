@@ -25,7 +25,6 @@ def testLayerAll(app, client, auth):
     # setting up a new session first
     response = client.post('/api/queue')
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    print(jsonResponse)
     sessionId = None
     with app.app_context():
         sessionId = str(Session.query.first().sessionId)
@@ -69,7 +68,7 @@ def testLayerAll(app, client, auth):
     Cases to test:
     1. session is non-existent (catch BadRequestException)
     2. member ID is invalid (catch BadRequestException)
-    3. invalid layer ID (catch BadRequestException)
+    3. deleting a layer that doesnt exist or is already deleted. check that {} is returned
     4. trying to delete a staged layer (no URL exists) (catch BadRequestException)
     5. normal case (bucket delete): delete a layer with a set bucket URL. check that URL is null
     6. normal case (layer delete): delete a layer completely. check that number of layers decreased by 1
@@ -96,7 +95,6 @@ def testLayerAll(app, client, auth):
         "duration": 5.2,
         "fadeInDuration": 0.1,
         "fadeOutDuration": 1.5,
-        "reversed": False,
         "trimmedStartDuration": 0.5,
         "trimmedEndDuration": 1.0,
         "fileName": "Drum3",
@@ -119,7 +117,6 @@ def testLayerAll(app, client, auth):
     assert layer['duration'] == 5.2
     assert layer['fadeInDuration'] == 0.1
     assert layer['fadeOutDuration'] == 1.5
-    assert layer['isReversed'] == False
     assert layer['trimmedStartDuration'] == 0.5
     assert layer['trimmedEndDuration'] == 1.0
     assert layer['fileName'] == 'Drum3'
@@ -142,7 +139,6 @@ def testLayerAll(app, client, auth):
         "duration": 9.5,
         "fadeInDuration": 0.5,
         "fadeOutDuration": 0.8,
-        "reversed": False,
         "trimmedStartDuration": 0.0,
         "trimmedEndDuration": 0.0,
         "fileName": "Piano1",
@@ -231,9 +227,8 @@ def testLayerAll(app, client, auth):
 
     # case e3
     response = client.delete('api/session/' + sessionId + '/layers/' + str(badId))
-    assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "layer is not in this session" in jsonResponse['message']
+    assert jsonResponse == {}
 
     # case e4
     layerId = None
@@ -272,7 +267,6 @@ def testLayerAll(app, client, auth):
         "duration": 5.2,
         "fadeInDuration": 0.1,
         "fadeOutDuration": 1.5,
-        "reversed": False,
         "trimmedStartDuration": 0.9,  # changed
         "trimmedEndDuration": 1.0,
         "fileName": "Drum3",

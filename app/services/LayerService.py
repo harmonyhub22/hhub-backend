@@ -96,7 +96,6 @@ def deleteFile(sessionId, layerId, memberId):
 def deleteLayer(sessionId, memberId, layerId):
     session = getSessionById(sessionId)
     if (session == None or (session.member1Id != memberId and session.member2Id != memberId)):
-        print('cannot edit')
         raise BadRequestException('you cannot delete this layer')
 
     layerId = uuid.UUID(layerId)
@@ -104,7 +103,6 @@ def deleteLayer(sessionId, memberId, layerId):
     if layer == None: # already deleted
         return {}
     if layer.sessionId != uuid.UUID(sessionId):
-        print('layer not found')
         raise BadRequestException('layer is not in this session')
     
     if layer.bucketUrl != None:
