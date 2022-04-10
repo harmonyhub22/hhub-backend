@@ -55,7 +55,7 @@ class AuthenticationApi(Resource):
             print('setting cookie')
             authResp = make_response(jsonify({'success' : True}))
             try:
-                authResp.set_cookie('hhub-token', value=str(token), domain=os.getenv('CORS_ORIGIN'))
+                authResp.set_cookie('hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
             except:
                 authResp.set_cookie('hhub-token', value=str(token))
             return authResp
