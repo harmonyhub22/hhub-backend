@@ -20,7 +20,8 @@ def getCookie():
             return make_response(jsonify(authResp), 401) 
         
         try:
-            data = jwt.decode(token, secret, algorithms=["HS256"])
+            #data = jwt.decode(token, secret, algorithms=["HS256"])
+            data = jwt.decode(token, secret)
             memberId = data['memberId']
             if memberId == None or len(memberId) < 36:
                 raise UnauthorizedException('no memberId cookie found')
