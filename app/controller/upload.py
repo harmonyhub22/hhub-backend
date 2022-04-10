@@ -39,6 +39,9 @@ def putSong(sessionId):
     if not songFile:
         raise BadRequestException('file not provided')
 
+    memberId = request.headers['MEMBERID']
+    memberId = uuid.UUID(memberId)
+
     fileName = secure_filename(songFile.filename)
     contentType = request.mimetype
 

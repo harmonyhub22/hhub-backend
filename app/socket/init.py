@@ -1,5 +1,5 @@
 from flask import request, session
-from flask_socketio import SocketIO, leave_room, join_room, rooms
+from flask_socketio import SocketIO, leave_room, join_room, rooms, send
 from flask_socketio import emit
 from app.services.MemberService import getSid, setSid, updateSid, setOnline, setOffline, getBySid
 from app.services.SessionService import getById as getSessionById
@@ -11,13 +11,21 @@ def getRoomName(sessionId):
     return str("session-" + sessionId)
 
 def addToRoom(sid, roomName):
-    join_room(roomName, sid=sid)
+    print('adding ', sid, ' to', roomName)
+    join_room(roomName, sid=sid, namespace="/")
+    print('worked')
+
+def getSidRooms(sid):
+    return rooms(sid=sid, namespace="/")
 
 def removeFromRoom(sid, roomName):
-    leave_room(roomName, sid=sid)
+    leave_room(roomName, sid=sid, namespace="/")
 
 def emitMessageToRoom(event, data, roomName, includeSelf=True):
     sio.emit(event, data, room=roomName, includeSelf=includeSelf)
+
+def emitToSid(event, data, sid):
+    sio.emit(event, data, sid=sid)
 
 def destroyRoom(roomName):
     sio.close_room(room=roomName)
@@ -42,9 +50,11 @@ def connect():
         disconnectMember(memberId)
     setSid(memberId, sid)
 
+'''
 @sio.event
 def message(json):
     emit('message', 'sup')
+'''
 
 @sio.on('join_session')
 def joinRoom(json):
@@ -126,7 +136,6 @@ def sessionRoomMessage(json):
 @sio.on('leave_session')
 def sessionLeaveRoom(json):
     sid = request.sid
-    member = getBySid(sid)
     sessionId = json['sessionId']
     try:
         removeFromRoom(sid, getRoomName(sessionId))

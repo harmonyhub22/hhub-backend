@@ -49,12 +49,12 @@ def seed():
     #s.add(MatchingQueue(member3.memberId)) # will joins the queue
 
     # sessions
-    session1 = Session(member1.memberId, member4.memberId) # greg and dean join a session
-    session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
+    #session1 = Session(member1.memberId, member4.memberId) # greg and dean join a session
+    #session1.sessionId = 'b52d3f89-b5a6-43e9-b352-4161a273e659'
     # session1.endTime = datetime.datetime.utcnow()
-    s.add(session1)
+    #s.add(session1)
 
-    s.commit()
+    #s.commit()
 
     # layers
     #layer1 = Layer(session1.sessionId, member1.memberId, name='layer1', startTime=0.5, duration=5.2, fadeInDuration=0.1, 
@@ -65,8 +65,8 @@ def seed():
     #s.commit()
 
     # songs
-    song1 = Song(sessionId=session1.sessionId, memberId=member1.memberId, name='Some song')
-    song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
-    s.add(song1)
+    #song1 = Song(sessionId=session1.sessionId, memberId=member1.memberId, name='Some song')
+    #song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
+    # s.add(song1)
 
     s.commit()

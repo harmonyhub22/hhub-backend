@@ -22,7 +22,7 @@ def getAll():
     return Song.query.all()
     
 def getAllByUser(memberId):
-    return Song.query.join(Session, Session.sessionId==Song.sessionId).filter((Session.member1Id==memberId) | (Session.member2Id==memberId)).order_by(Song.createdAt).all()
+    return Song.query.join(Session, Session.sessionId==Song.sessionId).filter(Song.memberId==memberId).order_by(Song.createdAt).all()
 
 def getAllBySessionId(sessionId):
     return Song.query.filter(Song.sessionId==sessionId).all()
@@ -83,6 +83,8 @@ def uploadSong(sessionId, memberId, songFile, fileName, contentType):
     db.session.commit()
     return session
 
+'''
 def deleteAllFiles():
     songs = getAll()
     deleteAllSongFiles(songs)
+'''
