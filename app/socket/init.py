@@ -123,6 +123,16 @@ def sessionRoomMessage(json):
     if musicSession != None and (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
         emitMessageToRoom('session_room_message', data, getRoomName(sessionId), True)
 
+@sio.on('leave_session')
+def sessionLeaveRoom(json):
+    sid = request.sid
+    member = getBySid(sid)
+    sessionId = json['sessionId']
+    try:
+        removeFromRoom(sid, getRoomName(sessionId))
+    except:
+        print('could not leave room')
+
 @sio.on('disconnect')
 def disconnect():
     disconnectMember(request.sid)

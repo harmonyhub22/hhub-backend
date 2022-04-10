@@ -51,9 +51,8 @@ def deleteSong(songId, memberId):
 
 def addSong(sessionId, memberId, data):
     name = data.get('name')
-    duration = data.get('duration')
-    if name == None or duration == None:
-        raise BadRequestException('song name or duration not provided')
+    if name == None:
+        raise BadRequestException('song name not provided')
     
     session = getSessionById(sessionId)
     if session == None:
@@ -63,7 +62,7 @@ def addSong(sessionId, memberId, data):
         raise UnauthorizedException('unable to save this song')
 
     try:
-        song = Song(sessionId, memberId, name, duration)   
+        song = Song(sessionId, memberId, name)   
         db.session.add(song)
         db.session.commit()
         return song

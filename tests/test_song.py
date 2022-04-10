@@ -37,9 +37,8 @@ def testSongAll(app, client, auth):
     Service method tested: addOrEditLayer()
     Cases to test:
     1. song name not given (catch BadRequestException)  (done)
-    2. duration not given (catch BadRequestException)  (done)
-    3. valid song is added (check if number of songs increased by one and check metadata)  (done)
-    4. invalid session ID (error is thrown)  (done)
+    2. valid song is added (check if number of songs increased by one and check metadata)  (done)
+    3. invalid session ID (error is thrown)  (done)
 
     Route b: api/songs/<sessionID>/upload
     CRUD operation: PUT
@@ -104,9 +103,7 @@ def testSongAll(app, client, auth):
     assert jsonResponse == None
 
     # case a1
-    body = {
-        'duration': 7,
-    }
+    body = {}
     response = client.post(
         'api/songs/' + sessionId,
         data=json.dumps(body),
@@ -114,7 +111,7 @@ def testSongAll(app, client, auth):
     )
     assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "song name or duration not provided" in jsonResponse['message']
+    assert "song name not provided" in jsonResponse['message']
 
     # case a2
     body = {
@@ -125,24 +122,9 @@ def testSongAll(app, client, auth):
         data=json.dumps(body),
         headers={"Content-Type": "application/json"}
     )
-    assert response.status_code != 200
-    jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "song name or duration not provided" in jsonResponse['message']
-
-    # case a3
-    body = {
-        'name': 'new song!',
-        'duration': 7,
-    }
-    response = client.post(
-        'api/songs/' + sessionId,
-        data=json.dumps(body),
-        headers={"Content-Type": "application/json"}
-    )
     assert response.status_code == 200
     song = json.loads(response.data.decode('utf-8'))
     assert song['name'] == 'new song!'
-    assert song['duration'] == 7
     assert song['session']['sessionId'] == sessionId
     assert song['session']['member1']['memberId'] == str(deanId)
     assert song['session']['member2']['memberId'] == str(willId)
@@ -150,7 +132,7 @@ def testSongAll(app, client, auth):
         query = getAllSongs()
         assert len(query) == 1
 
-    # case a4
+    # case a3
     response = client.post(
         'api/songs/' + str(badId),
         data=json.dumps(body),
@@ -243,7 +225,6 @@ def testSongAll(app, client, auth):
         session2Id = getSessionByMemberId(gregId).sessionId
         body = {
             'name': 'another new song!',
-            'duration': 10,
         }
         newSong = addSong(session2Id, gregId, body)
         song2id = str(newSong.songId)

@@ -16,8 +16,7 @@ from app.api.AuthenticationAPI import AuthenticationApi
 from app.exceptions.ErrorHandler import handle_error
 from app.middleware.Auth import getCookie
 from app.socket.init import sio
-from app.controller.upload import layerUploadBlueprint
-from app.controller.upload import songUploadBlueprint
+from app.controller.upload import layerUploadBlueprint, songUploadBlueprint
 
 def create_app(test_config=None):
     app_path = os.path.dirname(os.path.abspath(__file__))
@@ -59,13 +58,12 @@ def create_app(test_config=None):
         
         db.create_all()
         
-        if test_config is None:
-            seed()
-        else:
-            seedTest()
-
         if local:
-            seed()
+            if test_config is None:
+                seed()
+            else:
+                seedTest()
+
         @app.route('/favicon.ico')
         def favicon():
             return send_from_directory(app.root_path,

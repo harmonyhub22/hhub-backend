@@ -65,7 +65,7 @@ def seed():
     #s.commit()
 
     # songs
-    song1 = Song(sessionId=session1.sessionId, memberId=member1.memberId, name='Some song', duration=60)
+    song1 = Song(sessionId=session1.sessionId, memberId=member1.memberId, name='Some song')
     song1.songId = 'e165e9e0-6a54-4bd9-9d78-0008d49f04d0'
     s.add(song1)
 
