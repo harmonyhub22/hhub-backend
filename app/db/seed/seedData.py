@@ -8,7 +8,7 @@ from app.db.models.Session import Session
 from app.db.models.MatchingQueue import MatchingQueue
 from app.db.models.Layer import Layer
 from app.db.models.Song import Song
-from  werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def seed():
     s = db.session()

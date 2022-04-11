@@ -28,14 +28,14 @@ class SongApi(Resource):
             return jsonify(getAllByUser(memberId))
         return jsonify(getAll())
 
-    def post(self, sessionId):
+    def post(self, id): # BiG note: this id is the sessionId
         data = request.get_json(force=True)
         memberId = request.headers['MEMBERID']
         
         if not memberId:
             raise BadRequestException('no member ID')
         memberId = uuid.UUID(memberId)
-        return jsonify(addSong(sessionId, memberId, data))
+        return jsonify(addSong(id, memberId, data))
 
     def delete(self, id):
         memberId = request.headers['MEMBERID']
