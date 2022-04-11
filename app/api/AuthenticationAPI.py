@@ -59,8 +59,12 @@ class AuthenticationApi(Resource):
             authResp['success'] = True
             resp = make_response(jsonify(authResp))
             try:
-                resp.set_cookie(key='hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
+                print('cookie domain', os.getenv('COOKIE_DOMAIN'))
+                resp.set_cookie(key='hhub-token', value=str(token),
+                    secure=True, max_age=datetime.utcnow() + timedelta(minutes=1440), 
+                    path="/") #domain=os.getenv('COOKIE_DOMAIN'))
             except Exception:
+                print('setting normal cookie')
                 resp.set_cookie(key='hhub-token', value=str(token))
             return resp
         else:
