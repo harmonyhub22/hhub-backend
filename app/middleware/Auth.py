@@ -9,8 +9,7 @@ def getCookie():
         return
     
     else:
-        token = request.cookies.get('hhub-token')
-        print(request.cookies)
+        token = request.cookies.get('hhub-token-2')
         print('token', token)
         if token == None:
             raise UnauthorizedException('You are not authorized to access this page!')
