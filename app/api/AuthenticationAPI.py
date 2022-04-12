@@ -61,7 +61,7 @@ class AuthenticationApi(Resource):
             try:
                 print('cookie domain', os.getenv('COOKIE_DOMAIN'))
                 resp.set_cookie(key='hhub-token', value=str(token),
-                    secure=True, max_age=datetime.utcnow() + timedelta(minutes=1440), 
+                    secure=True, max_age=timedelta(days=1), 
                     path="/", domain=os.getenv('COOKIE_DOMAIN'))
             except Exception as exc:
                 print(str(exc))
