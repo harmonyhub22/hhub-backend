@@ -54,7 +54,7 @@ class AuthenticationApi(Resource):
                 authResp['reason'] = "Sorry, we are having some trouble logging you in at this time. Please try again later."
                 return make_response(jsonify(authResp), 401)
 
-            print('setting cookie')
+            print('setting cookie to', token)
             authResp['hhub-token'] = token
             authResp['success'] = True
             resp = make_response(jsonify(authResp))

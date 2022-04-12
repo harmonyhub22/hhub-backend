@@ -42,7 +42,7 @@ def deleteSong(songId, memberId):
                 print('delted bucket file')
         except Exception:
             raise ServerErrorException('could not delete song')
-    try: 
+    try:
         print(song)
         db.session.delete(song)
         db.session.commit()
