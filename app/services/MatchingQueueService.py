@@ -21,6 +21,7 @@ def getTop():
 
 def match(member1Id, queueItem): # if there are 2 users in the queue, create the session with them
     newSession = createSession(member1Id, queueItem.memberId)
+    print("session created", newSession.member1.firstname, newSession.member2.lastname)
     db.session.add(newSession)
     db.session.commit()
     db.session.delete(queueItem)
