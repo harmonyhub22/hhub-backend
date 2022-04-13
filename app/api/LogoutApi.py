@@ -6,5 +6,8 @@ class LogoutApi(Resource):
 
     def post(self):
         resp = make_response(jsonify({}), 200)
-        resp.delete_cookie('hhub-token', path="/", domain=os.getenv('COOKIE_DOMAIN'))
+        try:
+            resp.delete_cookie('hhub-token', path="/", domain=os.getenv('COOKIE_DOMAIN'))
+        except:
+            resp.delete_cookie('hhub-token')
         return resp
