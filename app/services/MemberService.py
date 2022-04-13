@@ -63,16 +63,6 @@ def deleteMember(memberId):
         db.session.rollback()
         raise ServerErrorException('could not delete member')
 
-def setOnline(memberId):
-    member = getById(memberId)
-    member.isOnline = True
-    db.session.commit()
-
-def setOffline(memberId):
-    member = getById(memberId)
-    member.isOnline = False
-    db.session.commit()
-
 # web socket utils
 def getSid(memberId):
     return getById(memberId).sid
@@ -94,6 +84,8 @@ def updateSid(memberId, sid=None):
         member.sid = sid
         if sid == None:
             member.isOnline = False
+        else:
+            member.isOnline = True
         db.session.commit()
         return member.sid
     except Exception:

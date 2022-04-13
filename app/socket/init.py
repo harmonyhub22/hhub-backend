@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_socketio import SocketIO, leave_room, join_room, rooms, send
 from flask_socketio import emit
-from app.services.MemberService import getSid, setSid, updateSid, setOnline, setOffline, getBySid
+from app.services.MemberService import getSid, setSid, updateSid, getBySid
 from app.services.SessionService import getById as getSessionById
 from app.services.LayerService import getById as getLayerById
 
