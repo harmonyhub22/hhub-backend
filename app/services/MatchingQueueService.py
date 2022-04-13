@@ -20,10 +20,10 @@ def getTop():
     return MatchingQueue.query.order_by(MatchingQueue.timeEntered.asc()).first()
 
 def match(member1Id, queueItem): # if there are 2 users in the queue, create the session with them
-    db.session.delete(queueItem)
-    db.session.commit()
     newSession = createSession(member1Id, queueItem.memberId)
     db.session.add(newSession)
+    db.session.commit()
+    db.session.delete(queueItem)
     db.session.commit()
     return newSession
 
