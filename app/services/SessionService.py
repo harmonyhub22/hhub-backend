@@ -29,18 +29,22 @@ def createSession(member1Id, member2Id):
     print(member1.firstname, member2.firstname)
     if not member2 or not member1:
         raise BadRequestException('member does not exist')
+    print('members exists')
     if member2Id == member1Id:
         raise BadRequestException('cannot start session with yourself')
-
+    print('they are not the same')
     existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
                                          | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
     if existing_session != None:
         raise BadRequestException('you or other member is already in a Session')
-
     print("no existing session")
+
     record = Session(member1Id, member2Id)
+    print('created record')
     db.session.add(record)
+    print('added record')
     db.session.commit()
+    print('committed record')
     return record
 
 def endSession(memberId, sessionId):
