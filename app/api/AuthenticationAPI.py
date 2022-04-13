@@ -16,7 +16,6 @@ class AuthenticationApi(Resource):
         authResp = {
             'reason': '',
             'success': False,
-            'hhub-token': '',
         }
         print(data)
 
@@ -55,7 +54,6 @@ class AuthenticationApi(Resource):
                 return make_response(jsonify(authResp), 401)
 
             print('setting cookie to', token)
-            authResp['hhub-token'] = token
             authResp['success'] = True
             resp = make_response(jsonify(authResp))
             try:
@@ -69,7 +67,6 @@ class AuthenticationApi(Resource):
                     samesite='None',
                     domain=os.getenv('COOKIE_DOMAIN')
                 )
-                #resp.headers["Set-Cookie"] = "hhub-token=" + str(token)
             except Exception as exc:
                 print(str(exc))
                 print('setting normal cookie')
@@ -87,7 +84,6 @@ class AuthenticationApi(Resource):
         authResp = {
             'reason': '',
             'success': False,
-            'hhub-token': ''
         }
 
         if not data:
@@ -130,10 +126,19 @@ class AuthenticationApi(Resource):
             return make_response(jsonify(authResp), 401)
         
         authResp['success'] = True
-        authResp['hhub-token'] = str(token)
         resp = make_response(jsonify(authResp))
         try:
-            resp.set_cookie('hhub-token', value=str(token), domain=os.getenv('COOKIE_DOMAIN'))
-        except Exception:
-            resp.set_cookie('hhub-token', value=str(token))
+            resp.set_cookie(
+                key='hhub-token',
+                value=str(token),
+                secure=True,
+                max_age=timedelta(days=1), 
+                path="/",
+                samesite='None',
+                domain=os.getenv('COOKIE_DOMAIN')
+            )
+        except Exception as exc:
+            print(str(exc))
+            print('setting normal cookie')
+            resp.set_cookie(key='hhub-token', value=str(token))
         return resp
