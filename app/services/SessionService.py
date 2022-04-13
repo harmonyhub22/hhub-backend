@@ -41,7 +41,9 @@ def createSession(member1Id, member2Id):
     try:
         record = Session(member1Id, member2Id)
         return record
-    except Exception:
+    except Exception as e:
+        print('exception in create Session')
+        print(str(e))
         db.session.rollback()
         raise ServerErrorException('cannot create Session')
 
