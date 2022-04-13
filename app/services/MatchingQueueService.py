@@ -39,9 +39,10 @@ def joinOrAttemptMatch(memberId):
 
     # if theres 1 person currently in the queue, match with them
     topQueued = getTop()
+    print("top user in queue is", topQueued.member.firstname)
     if topQueued != None:
         session = match(memberId, topQueued)
-        print(session.sessionId)
+        print("new session", session.sessionId)
         try:
             sid1 = getSid(session.member1.memberId)
             addToRoom(sid1, str('session-' + str(session.sessionId)))
