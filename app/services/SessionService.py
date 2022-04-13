@@ -36,6 +36,7 @@ def createSession(member1Id, member2Id):
     if existing_session != None:
         raise BadRequestException('you or other member is already in a Session')
 
+    print("no existing session")
     try:
         record = Session(member1Id, member2Id)
         return record
