@@ -26,6 +26,7 @@ def getLiveSession(memberId):
 def createSession(member1Id, member2Id):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
+    print(member1.firstname, member2.firstname)
     if not member2 or not member1:
         raise BadRequestException('member does not exist')
     if member2Id == member1Id:
