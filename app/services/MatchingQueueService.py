@@ -20,6 +20,7 @@ def getTop():
     return MatchingQueue.query.order_by(MatchingQueue.timeEntered.asc()).first()
 
 def match(member1Id, queueItem): # if there are 2 users in the queue, create the session with them
+    print('queue item memberId', queueItem.memberId)
     newSession = createSession(member1Id, queueItem.memberId)
     print(newSession.sessionId)
     print("session created", newSession.member1.firstname, newSession.member2.lastname)

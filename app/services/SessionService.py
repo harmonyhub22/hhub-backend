@@ -27,7 +27,8 @@ def createSession(member1Id, member2Id):
     member1 = getMemberById(member1Id)
     member2 = getMemberById(member2Id)
     print(member1.firstname, member2.firstname)
-    if not member2 or not member1:
+    if member2 == None or member1 == None:
+        print('a member does not exist')
         raise BadRequestException('member does not exist')
     print('members exists')
     if member2Id == member1Id:
