@@ -43,9 +43,9 @@ def joinOrAttemptMatch(memberId):
     if topQueued != None:
         print("top user in queue is", topQueued.member.firstname)
         print("matching...")
-        session = match(memberId, topQueued)
-        print("new session", session.sessionId)
         try:
+            session = match(memberId, topQueued)
+            print("new session", session.sessionId)
             sid1 = getSid(session.member1.memberId)
             addToRoom(sid1, str('session-' + str(session.sessionId)))
             print('sid1', sid1)
@@ -53,8 +53,6 @@ def joinOrAttemptMatch(memberId):
             addToRoom(sid2, str('session-' + str(session.sessionId)))
             print('sid2', sid2)
             emitMessageToRoom("session_made", { 'sessionId': str(session.sessionId) }, roomName=str("session-" + str(session.sessionId)))
-            db.session.delete(topQueued)
-            db.session.commit()
             return None
         except Exception as e:
             print('exception encountered')
