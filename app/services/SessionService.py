@@ -34,9 +34,11 @@ def createSession(member1Id, member2Id):
     if member2Id == member1Id:
         raise BadRequestException('cannot start session with yourself')
     print('they are not the same')
-    existing_session = Session.query.filter((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
-                                         | (Session.member1Id==member2Id) | (Session.member2Id==member1Id)).first()
+    existing_session = Session.query.filter(((Session.member1Id==member1Id) | (Session.member2Id==member2Id)
+                                         | (Session.member1Id==member2Id) | (Session.member2Id==member1Id))
+                                         & (Session.endTime==None)).first()
     if existing_session != None:
+        print('theres an existing session')
         raise BadRequestException('you or other member is already in a Session')
     print("no existing session")
 
