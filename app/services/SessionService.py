@@ -38,14 +38,10 @@ def createSession(member1Id, member2Id):
         raise BadRequestException('you or other member is already in a Session')
 
     print("no existing session")
-    try:
-        record = Session(member1Id, member2Id)
-        return record
-    except Exception as e:
-        print('exception in create Session')
-        print(str(e))
-        db.session.rollback()
-        raise ServerErrorException('cannot create Session')
+    record = Session(member1Id, member2Id)
+    db.session.add(record)
+    db.session.commit()
+    return record
 
 def endSession(memberId, sessionId):
     session = Session.query.get(sessionId)
