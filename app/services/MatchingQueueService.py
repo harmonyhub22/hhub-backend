@@ -39,8 +39,9 @@ def joinOrAttemptMatch(memberId):
 
     # if theres 1 person currently in the queue, match with them
     topQueued = getTop()
-    print("top user in queue is", topQueued.member.firstname)
     if topQueued != None:
+        print("top user in queue is", topQueued.member.firstname)
+        print("matching...")
         session = match(memberId, topQueued)
         print("new session", session.sessionId)
         try:
