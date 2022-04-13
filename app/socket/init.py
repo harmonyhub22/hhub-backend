@@ -84,7 +84,7 @@ def pull_layer(json):
         return
     musicSession = getSessionById(sessionId)
     if (musicSession.member1Id == member.memberId or musicSession.member2Id == member.memberId):
-        emitMessageToRoom('pull_layer', {}, getRoomName(sessionId), includeSelf=False)
+        emitMessageToRoom('pull_layer', {}, getRoomName(sessionId), includeSelf=True)
 
 @sio.on('session_vote_end')
 def sessionVoteEnd(json):
