@@ -72,7 +72,7 @@ def testSignup(app, client):
         data=json.dumps({'email': '',  'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
         headers={"Content-Type": "application/json"})
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert 'Please provide a password' in jsonResponse['reason']
+    assert 'Please provide your email' in jsonResponse['reason']
 
     # case 7
     response = client.post(
@@ -147,8 +147,8 @@ def testLogin(auth):
 @pytest.mark.parametrize(('email', 'password', 'message'), (
 ('', 'a', 'Please provide your email.'),
 ('vitruong00@tamu.edu', '', 'Please provide a password.'),
-('a', 'password', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
-('a', 'a', 'Account does not exist! Please create an account first, or check that you entered the correct information!'),
+('a', 'password', 'Account does not exist or incorrect. Please create an account first!'),
+('a', 'a', 'Account does not exist or incorrect. Please create an account first!'),
 ('vitruong00@tamu.edu', 'a', 'Incorrect password!'),
 ))
 def testLoginValidateInput(auth, email, password, message):
@@ -171,7 +171,7 @@ def testLoginWithInvalidMember(app, auth):
         member = getMemberByEmail(email)
         assert member is None
         
-def testLoginWithValidAuthMember(app,auth):
+def testLoginWithValidAuthMember(app, auth):
     auth.login()
     email = "vitruong00@tamu.edu"
     with app.app_context():
@@ -179,23 +179,11 @@ def testLoginWithValidAuthMember(app,auth):
         authMember = getAuthByMemberId(member.memberId)
         assert authMember is not None
         
-def testLoginWithNoneMember(app,auth):
+def testLoginWithNoneMember(app, auth):
     email = "jennie@gmail.com"
     with app.app_context():
         member = getMemberByEmail(email)
         if member is None:
             response = auth.login(email)
             jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'Account does not exist! Please create an account first, or check that you entered the correct information!' == jsonResponse['reason']
-            
-def testLoginWithNoneAuthMember(app,auth):
-    email = "jennie@gmail.com"
-    firstname = "Jennie"
-    lastname = "Kim"
-    with app.app_context():
-        member = addMember(email, firstname, lastname)
-        authMember = getAuthByMemberId(member.memberId)
-        if authMember is None:
-            response = auth.login(email)
-            jsonResponse = json.loads(response.data.decode('utf-8'))
-            assert 'There was a problem logging you in. We are sorry about that! Please try again later.' == jsonResponse['reason']
+            assert 'Account does not exist or incorrect. Please create an account first!' == jsonResponse['reason']
