@@ -12,12 +12,16 @@ Route: api/signup
 REST operation: POST
 Service methods tested: addMember(), getByMemberId(), addOrUpdateAuth(), generateToken()
 Cases to test:
-1. no email provided (catch 400 error)
-2. no password provided (catch 400 error)
-3. if user is not a member, create them and authenticate them. check queryset and hhub-token
-4. is a member and tries signing up again, so it logs them in. check 200 response
+1. normal sign up (no user exists with email, all info provided). check that query is not None
+2. no info at all is provided. check 400 error message
+3. no first name provided. check 400 error message
+4. no last name provided. check 400 error message
+5. no password provided. check 400 error message
+6. no email provided. check 400 error message
+7. trying to sign up with an email thats already taken. check 400 error message
 '''
-def testSignup(client):
+def testSignup(app, client):
+    # case 1
     response = client.post(
         '/api/signup', 
         data=json.dumps({'email': 'a', 'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
@@ -25,21 +29,58 @@ def testSignup(client):
     )
     jsonResponse = json.loads(response.data.decode('utf-8'))
     assert jsonResponse['success'] == True
+
+    with app.app_context():
+        user = getMemberByEmail('a')
+        assert user != None
     
-@pytest.mark.parametrize(('email', 'firstname', 'lastname', 'password', 'message'), (
-    ('', '', '', '', 'Please provide your email.'),
-    ('a', '', 'a', 'a', 'Please provide your first and last name.'),
-    ('a', 'a', '', 'a', 'Please provide your first and last name.'),
-    ('a', 'a', 'a', '', 'Please provide a password.'),
-    ('a', 'a', 'a', 'a', 'Account is already registered.'),
-))
-def testSignupValidateInput(client, email, firstname, lastname, password, message):
+    # case 2
     response = client.post(
         '/api/signup',
-        data=json.dumps({'email': email,  'firstname': firstname, 'lastname': lastname, 'password': password}),
+        data=json.dumps({'email': '',  'firstname': '', 'lastname': '', 'password': ''}),
         headers={"Content-Type": "application/json"})
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert message == jsonResponse['reason']
+    assert 'Please provide your email' in jsonResponse['reason']
+
+    # case 3
+    response = client.post(
+        '/api/signup',
+        data=json.dumps({'email': 'a',  'firstname': '', 'lastname': 'a', 'password': 'a'}),
+        headers={"Content-Type": "application/json"})
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert 'Please provide your first and last name' in jsonResponse['reason']
+
+    # case 4
+    response = client.post(
+        '/api/signup',
+        data=json.dumps({'email': 'a',  'firstname': 'a', 'lastname': '', 'password': 'a'}),
+        headers={"Content-Type": "application/json"})
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert 'Please provide your first and last name' in jsonResponse['reason']
+
+    # case 5
+    response = client.post(
+        '/api/signup',
+        data=json.dumps({'email': 'a',  'firstname': 'a', 'lastname': 'a', 'password': ''}),
+        headers={"Content-Type": "application/json"})
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert 'Please provide a password' in jsonResponse['reason']
+
+    # case 6
+    response = client.post(
+        '/api/signup',
+        data=json.dumps({'email': '',  'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
+        headers={"Content-Type": "application/json"})
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert 'Please provide a password' in jsonResponse['reason']
+
+    # case 7
+    response = client.post(
+        '/api/signup',
+        data=json.dumps({'email': 'a',  'firstname': 'a', 'lastname': 'a', 'password': 'a'}),
+        headers={"Content-Type": "application/json"})
+    jsonResponse = json.loads(response.data.decode('utf-8'))
+    assert 'Member with this email already exists' in jsonResponse['reason']
     
 def testSignupAddMember(app):
     email = "jennie@gmail.com"
