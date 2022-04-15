@@ -117,7 +117,7 @@ def testEndSession(app, client, auth):
     response = client.post('/api/session/28cf2179-0000-0000-a14c-3c09bd904365/end')
     assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "session does not exist" in jsonResponse['message']
+    assert "you cannot modify this Session" in jsonResponse['message']
 
     # Greg and Will join a session
     sessionId = None
@@ -129,4 +129,4 @@ def testEndSession(app, client, auth):
     response = client.post('/api/session/' + str(sessionId) + '/end')
     assert response.status_code != 200
     jsonResponse = json.loads(response.data.decode('utf-8'))
-    assert "you are not in this session" in jsonResponse['message']
+    assert "you cannot modify this Session" in jsonResponse['message']

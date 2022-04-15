@@ -7,7 +7,7 @@ from app.db.models.Session import Session
 from app.exceptions.BadRequestException import BadRequestException
 from app.services.AuthService import generateToken, getByMemberId as getByMemberIdAuth
 from app.services.SessionService import getById as getByIdSession, getAll as getAllSessions, getByMemberId as getSessionByMemberId
-from app.services.SongService import addSong, getAll as getAllSongs, getBySessionId
+from app.services.SongService import addSong, getAll as getAllSongs, getAllBySessionId as getAllSongsBySessionId, getBySessionId
 from requests_toolbelt import MultipartEncoder
 from werkzeug.utils import secure_filename
 from app.services.SongService import uploadSong
@@ -144,7 +144,7 @@ def testSongAll(app, client, auth):
     # case b1
     m = MultipartEncoder(fields={'file': ('file', open('tests/song.mp3', 'rb'), 'audio/mpeg')})
     response = client.put(
-        'api/songs/' + str(badId) + '/upload',
+        'api/session/' + str(badId) + '/upload',
         data=m,
         headers={"Content-Type": m.content_type}
     )
@@ -166,7 +166,7 @@ def testSongAll(app, client, auth):
     assert session.bucketUrl == None
     m = MultipartEncoder(fields={'file': ('file', open('tests/song.mp3', 'rb'), 'audio/mpeg')})
     response = client.put(
-        'api/songs/' + sessionId + '/upload',
+        'api/session/' + sessionId + '/upload',
         data=m,
         headers={"Content-Type": m.content_type}
     )
