@@ -4,15 +4,15 @@ Built with Flask
 
 <hr></hr>
 
+## Description 
+
 This is the frontend of the Harmony Hub application created by Team Musico for Senior CSCE 482 Capstone Spring 2022. The code contains REST api endpoints, socket-io endpoints, a PostgreSQL database implementation and connection, and AWS S3 bucket file storage logic.
 
-**View Deployed Server**
+## View Deployed Server
 
 Visit the <a href="https://harmony-hub-backend.herokuapp.com/" target="_blank">Heroku Server</a>
 
-<hr></hr>
-
-**Spin-up Server locally**
+## Spin-up Server locally
 
 Set-up Instructions
 
@@ -76,7 +76,7 @@ Set-up Instructions
     Go to <a href="http://localhost:5000" target="_blank">Localhost Port 5000</a>
 
 
-# Notes for Developers
+## Notes for Developers
 
 I. To leave the python virtual environment, simply enter
 
