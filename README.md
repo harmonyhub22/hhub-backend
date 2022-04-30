@@ -25,11 +25,13 @@ Set-up Instructions
 
 3. Get the Environment Variables file <code>.env</code> from a team member.
 
-4. Enter the virtual environment
+4. Create a virtual environment if you have not already
 
     ```
     python3 -m venv venv
     ```
+   
+5. Activate (enter) the virtual environment
 
     Windows
     ```
@@ -41,42 +43,61 @@ Set-up Instructions
     source venv/bin/activate
     ```
 
-5. Download the required packages
+6. Download the required packages
 
     ```
     pip install -r requirements.txt
     ```
 
-6. Start the server and database
+7. Start the server and database
 
     Mac
     ```
-    ./sh-run.sh
+    docker-compose down
+    docker-compose up -d
+    export FLASK_APP="run.py"
+    export FLASK_ENV="development"
+    flask run
     ```
 
     Windows
     ```
-    .\ps-run.ps1
+    docker-compose down
+    docker-compose up -d
+    $env:FLASK_APP="run.py"
+    $env:FLASK_ENV="development"
+    flask run
     ```
+   
+8. Visit in the browser
 
+Go to <a href="http://localhost:5000" target="_blank">Localhost Port 5000</a>
 
-To leave the virtual environment, simply enter <code>deactivate</code>
 
 # Notes for Developers
 
-I. After adding a new pip library, be sure to run
+I. To leave the python virtual environment, simply enter
+
+```
+deactivate
+```
+
+II. After adding a new pip library (eg. pip install ...), be sure to run
 
 ```
 pip freeze > requirements.txt
 ```
 
-II. To deploy to Production Server, add a Heroku remote as follows
+III. To deploy to Production Server, add a Heroku remote as follows
 
 ```
-git remote add heroku git@github.com:harmonyhub22/hhub-backend.git
+heroku git:remote -a harmony-hub-backend # adds a heroku remote called heroku
+git add .
+git commit -m "deploying to production"
+git push heroku master
 ```
 
-III. Enter the Local Postgres Datbase with the following command
+IV. Enter the Local Postgres Datbase with the following command
 (Docker Container: hhub-db)
 
 ```
@@ -84,8 +105,10 @@ psql -h localhost -p 5432 -U hhubuser -W
 ```
 Password: literally anything
 
-IV. Trouble connecting to the local database?
+V. Trouble connecting to the local database?
 
 Stop the Postgres Service on your local computer.
 
-V. Look at the <a href="https://www.postman.com/orange-capsule-30931/workspace/hhub-backend" target="_blank">Postman Workspace</a> for api endpoint reference.
+VI. For API endpoint reference, check out our
+
+<a href="https://www.postman.com/orange-capsule-30931/workspace/hhub-backend" target="_blank">Postman Workspace</a>
