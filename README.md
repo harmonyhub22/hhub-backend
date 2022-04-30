@@ -71,7 +71,7 @@ Set-up Instructions
    
 8. Visit in the browser
 
-Go to <a href="http://localhost:5000" target="_blank">Localhost Port 5000</a>
+    Go to <a href="http://localhost:5000" target="_blank">Localhost Port 5000</a>
 
 
 # Notes for Developers
